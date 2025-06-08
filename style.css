@@ -1,0 +1,65 @@
+:root {
+    --insert: none;
+}
+body {
+    margin: 20px;
+}
+#c1 {
+    display: flex;
+    flex-direction: row;
+    gap: 4px;
+}
+#_drawing {
+    width: fit-content;
+    font-family: monospace;
+    line-height: 15px;
+    white-space: pre;
+    margin: 0;
+    user-select: none;
+    padding: 4px;
+    border: 2px solid black;
+    border-radius: 8px;
+}
+#_character {
+    font-family: monospace;
+    display: inline;
+    border: 2px solid black;
+    padding: 1px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-grow: 1;
+}
+#_insertText{
+    outline: 2px solid black;
+    display: inline;
+    background-color: white;
+}
+#_drawing[data-insert] > *:hover {
+    outline: 2px solid black;
+    animation: blink 1s infinite linear;
+}
+@keyframes blink {
+    0%{outline: 2px solid black}
+    49%{outline: 2px solid black}
+    50%{outline: none}
+    100%{outline: none}
+}
+#_timeline {
+    overflow-x: scroll;
+    display: grid;
+    grid-auto-flow: column dense;
+    grid-auto-columns: 20px;
+    height: fit-content;
+}
+#_timeline > div {
+    border: 1px solid black;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.timeline-selected {
+    background-color: lightblue;
+}

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/png" href="/asciimate_logo.png"/>
+    <title>Asciimate</title>
+</head>
+<body>
+    <code>Asciimate</code>
+    <div id="c1">
+        <div>
+            <div style="display: flex; gap: 10px">
+                Character
+                <div id="_character" >a</div><br>
+            </div>
+            <div>
+                <title>hi</title>
+                <label for="_insert">Insert</label>
+                <input id="_insert" type="checkbox" name="tools"><br>
+            </div>
+            <button onclick="navigator.clipboard.writeText(_drawing.textContent)">Copy to clipboard</button>
+        </div>
+        <pre id="_drawing"></pre>
+    </div>
+    <label for="_play">Play</label>
+    <input id="_play" type="checkbox">
+    <div id="_timeline"></div>
+    <script src="index.js"></script>
+</body>
+</html>
