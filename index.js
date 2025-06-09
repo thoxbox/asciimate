@@ -8,25 +8,24 @@ function inRange(value, min, max) {
 const $ = query => document.querySelector(query);
 const $$ = query => document.querySelectorAll(query);
 
+const width = 20;
+const height = 10;
+
 class Drawing {
-    #drawing; #width; #height;
-    constructor(width, height, fillCharacter = null, drawing = null) {
-        this.#width = width;
-        this.#height = height;
+    #drawing;
+    constructor(fillCharacter = null, drawing = null) {
         this.#drawing = drawing ? drawing : 
             Array(height).fill().map(x => Array(width).fill(fillCharacter));
     }
     get drawing() {return structuredClone(this.#drawing)}
-    get width() {return this.#width}
-    get height() {return this.#height}
     setPixel(x, y, character) {
-        if(!(inRange(x, 0, this.#width - 1) && inRange(y, 0, this.#height - 1))) {
+        if(!(inRange(x, 0, width - 1) && inRange(y, 0, height - 1))) {
             return;
         }
         this.#drawing[y][x] = character;
     }
     getPixel(x, y) {
-        if(!(inRange(x, 0, this.#width - 1) && inRange(y, 0, this.#height - 1))) {
+        if(!(inRange(x, 0, width - 1) && inRange(y, 0, height - 1))) {
             return;
         }
         return this.#drawing[y][x];
@@ -39,7 +38,7 @@ class Drawing {
         }).join("");
     }
     static clone(drawing) {
-        return new Drawing(drawing.width, drawing.height, null, drawing.drawing);
+        return new Drawing(null, drawing.drawing);
     }
 }
 class DrawingSelection {
@@ -51,7 +50,7 @@ class DrawingSelection {
         this.#selection = [];
     }
     pixel(x, y) {
-        if(inRange(x, 0, this.drawing.width - 1) && inRange(y, 0, this.drawing.height - 1)) {
+        if(inRange(x, 0, width - 1) && inRange(y, 0, height - 1)) {
             this.#selection.push({x: x, y: y});
         }
     }
@@ -132,16 +131,11 @@ class Mouse {
     })()
 }
 class _Animation {
-    #animation; #frame = 0; #width; #height;
-    constructor(width, height, frameAmount, fillCharacter, animation = null) {
-
-        this.#width = width;
-        this.#height = height;
+    #animation; #frame = 0;
+    constructor(frameAmount, fillCharacter, animation = null) {
         this.#animation = animation ? animation :
             this.#animation = new Array(frameAmount).fill()
-            .map(x => new Drawing(
-                width, height, fillCharacter
-            ));
+            .map(x => new Drawing(fillCharacter));
     }
     addFrame(drawing) {
         this.#animation.push(drawing);
@@ -158,15 +152,12 @@ class _Animation {
         this.#frame = index % this.#animation.length;
         this.renderTimeline();
     }
-
+    
     get frame() {return this.#animation[this.#frame]}
     set frame(layeredDrawing) {this.#animation[this.#frame] = layeredDrawing}
-
+    
     get animation() {return this.#animation}
     
-    get width() {return this.#width}
-    get height() {return this.#height}
-
     renderTimeline() {
         _timeline.innerHTML = "";
         for(let i = 0; i < this.#animation.length; i++) {
@@ -175,7 +166,7 @@ class _Animation {
         }
     }
 }
-let animation = new _Animation(20, 10, 40, " ");
+let animation = new _Animation(40, " ");
 animation.renderTimeline();
 animation.frame.render();
 _play.onchange = () => {
@@ -209,13 +200,12 @@ class Brush {
     static get pixelHeight() {return this.#pixelHeight}
     #size; #width; #height;
 
-    constructor(brushSize, usedDrawing) {
-        this.drawing = usedDrawing;
-        this.#size = clamp(brushSize, 1, Brush.#pixelWidth * this.drawing.width);
+    constructor(brushSize) {
+        this.#size = clamp(brushSize, 1, Brush.#pixelWidth * width);
         this.#calculateDimensions();
     }
     set size(value) {
-        this.#size = clamp(value, 1, Brush.#pixelWidth * this.drawing.width);
+        this.#size = clamp(value, 1, Brush.#pixelWidth * width);
         this.#calculateDimensions();
     }
     get size() {return this.#size}
@@ -241,7 +231,7 @@ class Brush {
     }
 }
 Brush.character = "a";
-let brush = new Brush(3, animation);
+let brush = new Brush(3);
 let hoveredElement = document.elementFromPoint(Mouse.x, Mouse.y);
 function drawingHovered() {
     return hoveredElement.getAttribute("class") == "pixel";
@@ -251,8 +241,8 @@ function getXYofPixel(pixelNode) {
         [...$$(".pixel")].indexOf(pixelNode) : -1;
     if(index == -1) {return}
     return {
-        x: index % animation.frame.width,
-        y: Math.floor(index / animation.frame.width)
+        x: index % width,
+        y: Math.floor(index / width)
     };
 }
 class Insert {
@@ -266,8 +256,8 @@ class Insert {
         _drawing.removeAttribute("data-insert");
         _drawing.removeAttribute("onclick");
         this.#pixel = getXYofPixel(hoveredElement);
-        let maxWidth = animation.width - this.#pixel.x;
-        let maxHeight = animation.height - this.#pixel.y;
+        let maxWidth = width - this.#pixel.x;
+        let maxHeight = height - this.#pixel.y;
         hoveredElement.innerHTML = `<div
                 style="
                     position: absolute; 
@@ -295,7 +285,6 @@ class Insert {
                 animation.frame.setPixel(this.#pixel.x + x, this.#pixel.y + y, char);
             }
         }
-        // hoveredElement = document.body;
         animation.frame.render();
         this.start();
     }
@@ -311,10 +300,11 @@ class Insert {
 
 setInterval(() => {
     if(_play.checked) {
+        animation.frame.render()
         return;
     }
-    hoveredElement = document.elementFromPoint(Mouse.x, Mouse.y);
     if(Insert.active) {return}
+    hoveredElement = document.elementFromPoint(Mouse.x, Mouse.y);
     let pixelPos = getXYofPixel(hoveredElement);
     if(!pixelPos) {animation.frame.render(); return}
     let drawingPreview = Drawing.clone(animation.frame);
