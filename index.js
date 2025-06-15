@@ -134,7 +134,7 @@ class _Animation {
     static renderTimeline() {
         _timeline.innerHTML = "";
         for(let i = 0; i < this.length; i++) {
-            _timeline.innerHTML += `<div ${i === this.frame ? "class='timeline-selected'" : ""}
+            _timeline.innerHTML += `<div ${i === this.#frame ? "class='timeline-selected'" : ""}
                 onclick="_Animation.frame = ${i}">${i + 1}</div>`
         }
     }
@@ -142,8 +142,9 @@ class _Animation {
     static get length() {return this.#length}
     static #frame = 0;
     static set frame(int) {
+        $$(`#_timeline > div`)[this.#frame].classList.remove("timeline-selected");
         this.#frame = int % this.length;
-        this.renderTimeline();
+        $$(`#_timeline > div`)[this.#frame].classList.add("timeline-selected");
     }
     static get frame() {return this.#frame}
     #animation;
