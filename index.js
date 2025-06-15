@@ -131,51 +131,85 @@ class Mouse {
     })()
 }
 class _Animation {
-    #animation; #frame = 0;
-    constructor(frameAmount, fillCharacter, animation = null) {
-        this.#animation = animation ? animation :
-            this.#animation = new Array(frameAmount).fill()
-            .map(x => new Drawing(fillCharacter));
-    }
-    addFrame(drawing) {
-        this.#animation.push(drawing);
-    }
-    insertFrame(drawing, index) {
-        this.#animation.splice(index, 0, drawing);
-    }
-    deleteFrame(index) {
-        this.#animation.splice(index, 1);
-    }
-    
-    get frameIndex() {return this.#frame}
-    set frameIndex(index) {
-        this.#frame = index % this.#animation.length;
-        this.renderTimeline();
-    }
-    
-    get frame() {return this.#animation[this.#frame]}
-    set frame(layeredDrawing) {this.#animation[this.#frame] = layeredDrawing}
-    
-    get animation() {return this.#animation}
-    
-    renderTimeline() {
+    static renderTimeline() {
         _timeline.innerHTML = "";
-        for(let i = 0; i < this.#animation.length; i++) {
-            _timeline.innerHTML += `<div ${i === this.#frame ? "class='timeline-selected'" : ""}
-                onclick="animation.frameIndex = ${i}">${i + 1}</div>`
+        for(let i = 0; i < this.length; i++) {
+            _timeline.innerHTML += `<div ${i === this.frame ? "class='timeline-selected'" : ""}
+                onclick="_Animation.frame = ${i}">${i + 1}</div>`
         }
     }
+    static #length = 40;
+    static get length() {return this.#length}
+    static #frame = 0;
+    static set frame(int) {
+        this.#frame = int % this.length;
+        this.renderTimeline();
+    }
+    static get frame() {return this.#frame}
+    #animation;
+    /**  @param {string} fillCharacter @param {Drawing[] | null} animation*/
+    constructor(fillCharacter, animation = null) {
+        this.#animation = animation !== null ? animation :
+            this.#animation = new Array(_Animation.length).fill()
+            .map(x => new Drawing(fillCharacter));
+    }
+    
+    get frame() {return this.#animation[_Animation.frame]}
+    set frame(layeredDrawing) {this.#animation[_Animation.frame] = layeredDrawing}
+    
+    /** @returns {Drawing[]}*/
+    get animation() {return this.#animation}
 }
-let animation = new _Animation(40, " ");
-animation.renderTimeline();
+
+class Brush {
+    #size; #width; #height;
+
+    constructor(brushSize) {
+        this.#size = clamp(brushSize, 1, pixelWidth * width);
+        this.#calculateDimensions();
+    }
+    set size(value) {
+        this.#size = clamp(value, 1, pixelWidth * width);
+        this.#calculateDimensions();
+    }
+    get size() {return this.#size}
+    dimensions(x, y) {
+        return [
+            x - Math.round(this.#width / 2),
+            y - Math.round(this.#height / 2),
+            x + Math.round(this.#width / 2),
+            y + Math.round(this.#height / 2)
+        ];
+    }
+    #calculateDimensions() {
+        this.#width = Math.round(this.#size / pixelWidth);
+        this.#height = Math.round(this.#size / pixelHeight);
+    }
+    static #character;
+    static get character() {
+        return this.#character;
+    }
+    static set character(character) {
+        this.#character = character.charAt(0);
+        _character.innerHTML = this.#character;
+    }
+}
+let animation = new _Animation(" ");
+_Animation.renderTimeline();
 animation.frame.render();
+let pixelWidth = $$(".pixel")[0].getBoundingClientRect().width;
+let pixelHeight = $$(".pixel")[0].getBoundingClientRect().height;
+Brush.character = "a";
+let brush = new Brush(3);
+let hoveredElement = document.elementFromPoint(Mouse.x, Mouse.y);
 _play.onchange = () => {
     if(_play.checked) {
         if(_insert.checked) {
             Insert.end();
         }
         _play.setAttribute("data-setintervalid", setInterval(() => {
-            animation.frameIndex += 1;
+            _Animation.frame += 1;
+            animation.frame.render()
         }, 100));
     } else {
         if(_insert.checked) {
@@ -192,47 +226,6 @@ _insert.onchange = () => {
         Insert.end();
     }
 }
-
-class Brush {
-    static #pixelWidth = $$(".pixel")[0].getBoundingClientRect().width;
-    static #pixelHeight = $$(".pixel")[0].getBoundingClientRect().height;
-    static get pixelWidth() {return this.#pixelWidth}
-    static get pixelHeight() {return this.#pixelHeight}
-    #size; #width; #height;
-
-    constructor(brushSize) {
-        this.#size = clamp(brushSize, 1, Brush.#pixelWidth * width);
-        this.#calculateDimensions();
-    }
-    set size(value) {
-        this.#size = clamp(value, 1, Brush.#pixelWidth * width);
-        this.#calculateDimensions();
-    }
-    get size() {return this.#size}
-    dimensions(x, y) {
-        return [
-            x - Math.round(this.#width / 2),
-            y - Math.round(this.#height / 2),
-            x + Math.round(this.#width / 2),
-            y + Math.round(this.#height / 2)
-        ];
-    }
-    #calculateDimensions() {
-        this.#width = Math.round(this.#size / Brush.#pixelWidth);
-        this.#height = Math.round(this.#size / Brush.#pixelHeight);
-    }
-    static #character;
-    static get character() {
-        return this.#character;
-    }
-    static set character(character) {
-        this.#character = character.charAt(0);
-        _character.innerHTML = this.#character;
-    }
-}
-Brush.character = "a";
-let brush = new Brush(3);
-let hoveredElement = document.elementFromPoint(Mouse.x, Mouse.y);
 function drawingHovered() {
     return hoveredElement.getAttribute("class") == "pixel";
 }
@@ -247,17 +240,16 @@ function getXYofPixel(pixelNode) {
 }
 class Insert {
     static start() {
-        this.#active = true;
+        this.active = true;
         _drawing.setAttribute("data-insert", "");
         _drawing.setAttribute("onclick", "Insert.advance()");
     }
     static #pixel;
+    static #text;
     static advance() {
         _drawing.removeAttribute("data-insert");
         _drawing.removeAttribute("onclick");
         this.#pixel = getXYofPixel(hoveredElement);
-        let maxWidth = width - this.#pixel.x;
-        let maxHeight = height - this.#pixel.y;
         hoveredElement.innerHTML = `<div
                 style="
                     position: absolute; 
@@ -266,7 +258,6 @@ class Insert {
             ><div
                 contenteditable
                 id="_insertText"
-                onblur="this.focus()"
             >${hoveredElement.innerHTML}</div></div>`
              + hoveredElement.innerHTML;
         _insertText.focus();
@@ -275,11 +266,11 @@ class Insert {
                 this.render();
             }
         }
+        _insertText.onblur = () => _insertText.focus();
         window.getSelection().setBaseAndExtent(_insertText, 0, _insertText, 1);
     }
     static render() {
         let text = _insertText.textContent;
-        let origin = getXYofPixel(this.#pixel);
         for(const [y, line] of text.split("\n").entries()) {
             for(const [x, char] of line.split("").entries()) {
                 animation.frame.setPixel(this.#pixel.x + x, this.#pixel.y + y, char);
@@ -292,19 +283,18 @@ class Insert {
         _drawing.removeAttribute("data-insert");
         _drawing.removeAttribute("onclick");
         animation.frame.render();
-        this.#active = false;
+        this.active = false;
     }
-    static #active;
-    static get active() {return this.#active}
+    static active = false;
+    static set active(value) {
+        return this.active
+    }
 }
 
 setInterval(() => {
-    if(_play.checked) {
-        animation.frame.render()
-        return;
-    }
-    if(Insert.active) {return}
+    if(_play.checked) {return}
     hoveredElement = document.elementFromPoint(Mouse.x, Mouse.y);
+    if(Insert.active) {return}
     let pixelPos = getXYofPixel(hoveredElement);
     if(!pixelPos) {animation.frame.render(); return}
     let drawingPreview = Drawing.clone(animation.frame);
