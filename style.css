@@ -47,12 +47,14 @@ body {
 }
 #_timeline {
     overflow-x: scroll;
+}
+.layer {
     display: grid;
     grid-auto-flow: column dense;
     grid-auto-columns: 20px;
     height: fit-content;
 }
-#_timeline > div {
+.layer > div {
     border: 1px solid black;
     width: 20px;
     height: 20px;

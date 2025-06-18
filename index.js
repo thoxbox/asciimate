@@ -1,8 +1,13 @@
+"use strict";
+
 function clamp(value, min, max) {
     return Math.min(max, Math.max(min, value));
 }
 function inRange(value, min, max) {
     return min <= value && value <= max;
+}
+function mod(n, m) {
+    return ((n % m) + m) % m;
 }
 
 const $ = query => document.querySelector(query);
@@ -142,9 +147,10 @@ class _Animation {
     static get length() {return this.#length}
     static #frame = 0;
     static set frame(int) {
-        $$(`#_timeline > div`)[this.#frame].classList.remove("timeline-selected");
-        this.#frame = int % this.length;
-        $$(`#_timeline > div`)[this.#frame].classList.add("timeline-selected");
+        const layerDOM = _timeline.children[layers.layer].children;
+        layerDOM[this.#frame].classList.remove("timeline-selected");
+        this.#frame = mod(int, this.#length);
+        layerDOM[this.#frame].classList.add("timeline-selected");
     }
     static get frame() {return this.#frame}
     #animation;
@@ -155,8 +161,8 @@ class _Animation {
             .map(x => new Drawing(fillCharacter));
     }
     
-    get frame() {return this.#animation[_Animation.frame]}
-    set frame(layeredDrawing) {this.#animation[_Animation.frame] = layeredDrawing}
+    get current() {return this.#animation[_Animation.frame]}
+    set current(layeredDrawing) {this.#animation[_Animation.frame] = layeredDrawing}
     
     /** @returns {Drawing[]}*/
     get animation() {return this.#animation}
@@ -195,14 +201,61 @@ class Brush {
         _character.innerHTML = this.#character;
     }
 }
-let animation = new _Animation(" ");
-_Animation.renderTimeline();
-animation.frame.render();
-let pixelWidth = $$(".pixel")[0].getBoundingClientRect().width;
-let pixelHeight = $$(".pixel")[0].getBoundingClientRect().height;
+
+class Layers {
+    renderTimeline() {
+        let rendered = "";
+        for(let j = 0; j < this.#layers.length; j++) {
+            rendered += "<div class='layer'>";
+            for(let i = 0; i < _Animation.length; i++) {
+                rendered += `<div ${i === _Animation.frame && j === this.#layer ? "class='timeline-selected'" : ""}
+                    onclick="layers.layer = ${j}; _Animation.frame = ${i}";>${i + 1}</div>`;
+            }
+            rendered += "</div>";
+        }
+        _timeline.innerHTML = rendered;
+    }
+    #layer = 0;
+    set layer(int) {
+        const layersDOM = _timeline.children;
+        layersDOM[this.#layer].children[_Animation.frame].classList.remove("timeline-selected");
+        this.#layer = mod(int, this.#layers.length);
+        layersDOM[this.#layer].children[_Animation.frame].classList.add("timeline-selected");
+    }
+    get layer() {return this.#layer}
+    #layers;
+    /**  @param {string} fillCharacter @param {Array | null} layers*/
+    constructor(fillCharacter, layerAmount, layers = null) {
+        if(layers !== null) {
+            this.#layers = layers;
+        }
+        this.#layers = layers !== null ? layers :
+            this.#layers = new Array(layerAmount).fill()
+            .map(x => new _Animation(fillCharacter));
+    }
+    
+    get current() {
+        return this.#layers[this.#layer].current}
+    set current(drawing) {this.#layers[this.#layer].current = drawing}
+    
+    /** @returns {Array}*/
+    get layers() {return this.#layers}
+}
+
+let layers = new Layers(" ", 3);
+Object.defineProperty(window, "currentDrawing", {
+    get () {return layers.current},
+    set (value) {layers.current = value}
+});
+layers.renderTimeline();
+currentDrawing.render();
+let pixelRect = $(".pixel").getBoundingClientRect();
+let pixelWidth = pixelRect.width;
+let pixelHeight = pixelRect.height;
 Brush.character = "a";
 let brush = new Brush(3);
 let hoveredElement = document.elementFromPoint(Mouse.x, Mouse.y);
+
 _play.onchange = () => {
     if(_play.checked) {
         if(_insert.checked) {
@@ -210,7 +263,7 @@ _play.onchange = () => {
         }
         _play.setAttribute("data-setintervalid", setInterval(() => {
             _Animation.frame += 1;
-            animation.frame.render()
+            render();
         }, 100));
     } else {
         if(_insert.checked) {
@@ -218,7 +271,7 @@ _play.onchange = () => {
         }
         clearInterval(_play.getAttribute("data-setintervalid"));
     }
-}
+};
 
 _insert.onchange = () => {
     if(_insert.checked) {
@@ -231,13 +284,28 @@ function drawingHovered() {
     return hoveredElement.getAttribute("class") == "pixel";
 }
 function getXYofPixel(pixelNode) {
-    const index = pixelNode||{}.parentElement == _drawing ?
-        [...$$(".pixel")].indexOf(pixelNode) : -1;
+    const index = [...$$(".pixel")].indexOf(pixelNode);
     if(index == -1) {return}
     return {
         x: index % width,
         y: Math.floor(index / width)
     };
+}
+function getCurrentLayers() {
+    return layers.layers.map(x => x.current)
+}
+function render(_layers = null) {
+    if(_layers === null) {
+        _layers = getCurrentLayers();
+    }
+    let rendered = new Drawing(" ")
+    for(let i of _layers) {
+        let selection = new DrawingSelection(i);
+        selection.filterPixels(x => x !== " ");
+        selection.drawing = rendered;
+        selection.setPixels((_, x, y) => i.getPixel(x, y));
+    }
+    rendered.render()
 }
 class Insert {
     static start() {
@@ -274,16 +342,16 @@ class Insert {
         let text = _insertText.textContent;
         for(const [y, line] of text.split("\n").entries()) {
             for(const [x, char] of line.split("").entries()) {
-                animation.frame.setPixel(this.#pixel.x + x, this.#pixel.y + y, char);
+                currentDrawing.setPixel(this.#pixel.x + x, this.#pixel.y + y, char);
             }
         }
-        animation.frame.render();
+        currentDrawing.render();
         this.start();
     }
     static end() {
         _drawing.removeAttribute("data-insert");
         _drawing.removeAttribute("onclick");
-        animation.frame.render();
+        currentDrawing.render();
         this.active = false;
     }
     static active = false;
@@ -297,20 +365,39 @@ setInterval(() => {
     hoveredElement = document.elementFromPoint(Mouse.x, Mouse.y);
     if(Insert.active) {return}
     let pixelPos = getXYofPixel(hoveredElement);
-    if(!pixelPos) {animation.frame.render(); return}
-    let drawingPreview = Drawing.clone(animation.frame);
+    if(!pixelPos) {render(); return}
+    let drawingPreview = Drawing.clone(currentDrawing);
     let previewSelection = new DrawingSelection(drawingPreview);
     previewSelection.rect(...brush.dimensions(pixelPos.x, pixelPos.y));
     previewSelection.setPixels(() => Brush.character);
     if(Mouse.leftClick) {
-        animation.frame = Drawing.clone(drawingPreview);
+        currentDrawing = Drawing.clone(drawingPreview);
     }
-    drawingPreview.render();
+    render(
+        getCurrentLayers()
+            .map((x, i) => i === layers.layer ? drawingPreview : x)
+    );
 }, 50);
 
 onkeydown = e => {
-    if(!drawingHovered() && hoveredElement != _character) {return}
     if(Insert.active) {return}
+    if(e.key.startsWith("Arrow")) {
+        switch(e.key) {
+            case "ArrowUp":
+                layers.layer -= 1;
+                break;
+            case "ArrowDown":
+                layers.layer += 1;
+                break;
+            case "ArrowRight":
+                _Animation.frame += 1;
+                break;
+            case "ArrowLeft":
+                _Animation.frame -= 1;
+                break;
+        }
+    }
+    if(!drawingHovered() && hoveredElement != _character) {return}
     if(e.key.length > 1) {return}
     Brush.character = e.key;
 }
