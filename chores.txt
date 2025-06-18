@@ -1,3 +1,0 @@
-Random Boring Chores
-    bro how tf do i fix that insert bug (note to self: put this off)
-    change console.log to log
