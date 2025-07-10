@@ -8,6 +8,22 @@
     <title>Asciimate</title>
 </head>
 <body>
+    <dialog id="_settings">
+        <form onsubmit="start(); return false">
+            Dimensions:
+            <input min="1" value="20" type="number" id="_settings_width">
+            X
+            <input min="1" value="10" type="number" id="_settings_height">
+            <br>
+            Frames:
+            <input min="1" value="40" type="number" id="_settings_frames">
+            <br>
+            Layers:
+            <input min="1" value="3" type="number" id="_settings_layers">
+            <br>
+            <input type="submit" value="CREATE">
+        </form>
+    </dialog>
     <code>Asciimate</code>
     <div id="c1">
         <div>

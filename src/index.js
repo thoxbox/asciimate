@@ -18,28 +18,30 @@ const $ = query => document.querySelector(query);
 /** @param {string} query @returns {NodeListOf<HTMLElement>} */
 const $$ = query => document.querySelectorAll(query);
 
-const width = 20;
-const height = 10;
-
 class Drawing {
+    /** @type {number} */ static width = null;
+    /** @type {number} */ static height = null;
     /**  @type {string[][]} */
     #drawing;
     /** @param {string} fillCharacter @param {string[][]} drawing */
     constructor(fillCharacter, drawing = null) {
+        if(Drawing.width === null || Drawing.height === null) {
+            throw new Error("Drawing.width and Drawing.height must be set before creating a Drawing object.");
+        }
         this.#drawing = drawing ? drawing : 
-            Array(height).fill().map(x => Array(width).fill(fillCharacter));
+            Array(Drawing.height).fill().map(x => Array(Drawing.width).fill(fillCharacter));
     }
     get drawing() {return structuredClone(this.#drawing)}
     /** @param {number} x @param {number} y @param {string} character */
     setPixel(x, y, character) {
-        if(!(inRange(x, 0, width - 1) && inRange(y, 0, height - 1))) {
+        if(!(inRange(x, 0, Drawing.width - 1) && inRange(y, 0, Drawing.height - 1))) {
             return;
         }
         this.#drawing[y][x] = character;
     }
     /** @param {number} x @param {number} y */
     getPixel(x, y) {
-        if(!(inRange(x, 0, width - 1) && inRange(y, 0, height - 1))) {
+        if(!(inRange(x, 0, Drawing.width - 1) && inRange(y, 0, Drawing.height - 1))) {
             return;
         }
         return this.#drawing[y][x];
@@ -70,7 +72,7 @@ class DrawingSelection {
     }
     /** @param {number} x @param {number} y */
     pixel(x, y) {
-        if(inRange(x, 0, width - 1) && inRange(y, 0, height - 1)) {
+        if(inRange(x, 0, Drawing.width - 1) && inRange(y, 0, Drawing.height - 1)) {
             this.#selection.push({x: x, y: y});
         }
     }
@@ -158,14 +160,15 @@ class Mouse {
     })()
 }
 class _Animation {
-    static #length = 40;
-    static get length() {return this.#length}
-    
+    /**@type {number}*/ static length = null;
     static #frame = 0;
     static set frame(frame) {
+        if(this.length === null) {
+            throw new Error("_Animation.length must be set before modifying _Animation.frame.");
+        }
         const layerDOM = _timeline.children[layers.layer].children;
         layerDOM[this.#frame].classList.remove("timeline-selected");
-        this.#frame = mod(frame, this.#length);
+        this.#frame = mod(frame, this.length);
         layerDOM[this.#frame].classList.add("timeline-selected");
     }
     static get frame() {return this.#frame}
@@ -175,6 +178,9 @@ class _Animation {
     
     /**  @param {string} fillCharacter @param {Drawing[]} animation*/
     constructor(fillCharacter, animation = null) {
+        if(_Animation.length === null) {
+            throw new Error("_Animation.length must be set before creating an _Animation object.");
+        }
         this.#animation = animation !== null ? animation :
             this.#animation = new Array(_Animation.length).fill()
             .map(x => new Drawing(fillCharacter));
@@ -193,12 +199,12 @@ class Brush {
     
     /** @param {number} brushSize */
     constructor(brushSize) {
-        this.#size = clamp(brushSize, 1, pixelWidth * width);
+        this.#size = clamp(brushSize, 1, pixelWidth * Drawing.width);
         this.#calculateDimensions();
     }
 
     set size(value) {
-        this.#size = clamp(value, 1, pixelWidth * width);
+        this.#size = clamp(value, 1, pixelWidth * Drawing.width);
         this.#calculateDimensions();
     }
     get size() {return this.#size}
@@ -279,6 +285,24 @@ class Insert {
         _drawing.removeAttribute("data-insert");
         _drawing.removeAttribute("onclick");
         this.#pixel = getXYofPixel(hoveredElement);
+        const _insertTextRendered = () => {
+            _insertText.focus();
+            _insertText.onkeydown = e => {
+                if (e.altKey && e.key == "Enter") {
+                    _insertText.onblur = null;
+                    _insertText.onkeydown = null;
+                    this.render();
+                }
+            }
+            _insertText.onblur = () => _insertText.focus();
+            window.getSelection().setBaseAndExtent(_insertText, 0, _insertText, 1);
+            observer.disconnect();
+        }
+        let observer = new MutationObserver(mutations => {
+            _insertTextRendered();
+            console.log("something happened");
+        });
+        observer.observe(hoveredElement, { childList: true });
         hoveredElement.innerHTML = `<div
                 style="
                     position: absolute; 
@@ -288,15 +312,7 @@ class Insert {
                 contenteditable
                 id="_insertText"
             >${hoveredElement.innerHTML}</div></div>`
-             + hoveredElement.innerHTML;
-        _insertText.focus();
-        _insertText.onkeydown = e => {
-            if (e.altKey && e.key == "Enter") {
-                this.render();
-            }
-        }
-        _insertText.onblur = () => _insertText.focus();
-        window.getSelection().setBaseAndExtent(_insertText, 0, _insertText, 1);
+            + hoveredElement.innerHTML;
     }
     static render() {
         let text = _insertText.textContent;
@@ -305,13 +321,12 @@ class Insert {
                 currentDrawing.setPixel(this.#pixel.x + x, this.#pixel.y + y, char);
             }
         }
-        currentDrawing.render();
+        render();
         this.start();
     }
     static end() {
         _drawing.removeAttribute("data-insert");
         _drawing.removeAttribute("onclick");
-        currentDrawing.render();
         this.active = false;
     }
     static active = false;
@@ -321,58 +336,23 @@ class Insert {
     }
 }
 
-let layers = new Layers(" ", 3);
+_settings.showModal();
+let layers;
 Object.defineProperty(window, "currentDrawing", {
     get () {return layers.current},
-    set (value) {layers.current = value}
+    set (value) {layers.current = value},
 });
-layers.renderTimeline();
-currentDrawing.render();
-let pixelRect = $(".pixel").getBoundingClientRect();
-let pixelWidth = pixelRect.width;
-let pixelHeight = pixelRect.height;
-Brush.character = "a";
-let brush = new Brush(3);
-let hoveredElement = document.elementFromPoint(Mouse.x, Mouse.y);
-
-_play.onchange = () => {
-    if(_play.checked) {
-        if(_insert.checked) {
-            Insert.end();
-        }
-        _play.setAttribute("data-setintervalid", setInterval(() => {
-            _Animation.frame += 1;
-            render();
-        }, 100));
-    } else {
-        if(_insert.checked) {
-            Insert.start();
-        }
-        clearInterval(_play.getAttribute("data-setintervalid"));
-    }
-};
-
-_insert.onchange = () => {
-    if(_insert.checked) {
-        if(!_play.checked) {Insert.start()}
-    } else {
-        Insert.end();
-    }
-}
-function drawingHovered() {
-    return hoveredElement.getAttribute("class") == "pixel";
-}
 /** @param {Element} pixelNode */
 function getXYofPixel(pixelNode) {
     const index = [...$$(".pixel")].indexOf(pixelNode);
     if(index == -1) {return}
     return {
-        x: index % width,
-        y: Math.floor(index / width)
+        x: index % Drawing.width,
+        y: Math.floor(index / Drawing.width)
     };
 }
 function getCurrentLayers() {
-    return layers.layers.map(x => x.current);
+        return layers.layers.map(x => x.current);
 }
 /** @param {Drawing[]} layers */
 function render(layers = null) {
@@ -389,49 +369,99 @@ function render(layers = null) {
     rendered.render();
 }
 
-setInterval(() => {
-    if(_play.checked) {return}
-    hoveredElement = document.elementFromPoint(Mouse.x, Mouse.y);
-    if(Insert.active) {return}
-    let pixelPos = getXYofPixel(hoveredElement);
-    if(!pixelPos) {render(); return}
-    let drawingPreview = Drawing.clone(currentDrawing);
-    let previewSelection = new DrawingSelection(drawingPreview);
-    previewSelection.rect(...brush.dimensions(pixelPos.x, pixelPos.y));
-    previewSelection.setPixels(() => Brush.character);
-    if(Mouse.leftClick) {
-        currentDrawing = Drawing.clone(drawingPreview);
-    }
-    render(
-        getCurrentLayers()
-            .map((x, i) => i === layers.layer ? drawingPreview : x)
-    );
-}, 50);
+let pixelRect;
+let pixelWidth;
+let pixelHeight;
+let brush;
+let hoveredElement;
 
-onkeydown = e => {
-    if(Insert.active) {return}
-    if(e.key.startsWith("Arrow")) {
-        switch(e.key) {
-            case "ArrowUp":
-                layers.layer -= 1;
-                break;
-            case "ArrowDown":
-                layers.layer += 1;
-                break;
-            case "ArrowRight":
+function start() {
+    _Animation.length = Number(_settings_frames.value);
+    Drawing.width = Number(_settings_width.value);
+    Drawing.height = Number(_settings_height.value);
+    layers = new Layers(" ", Number(_settings_layers.value));
+    layers.renderTimeline();
+    currentDrawing.render();
+    pixelRect = $(".pixel").getBoundingClientRect();
+    pixelWidth = pixelRect.width;
+    pixelHeight = pixelRect.height;
+    Brush.character = "a";
+    brush = new Brush(3);
+    hoveredElement = document.elementFromPoint(Mouse.x, Mouse.y);
+    _settings.close();
+
+    _play.onchange = () => {
+        if(_play.checked) {
+            if(_insert.checked) {
+                Insert.end();
+            }
+            _play.setAttribute("data-setintervalid", setInterval(() => {
                 _Animation.frame += 1;
-                break;
-            case "ArrowLeft":
-                _Animation.frame -= 1;
-                break;
+                render();
+            }, 100));
+        } else {
+            if(_insert.checked) {
+                Insert.start();
+            }
+            clearInterval(_play.getAttribute("data-setintervalid"));
+        }
+    };
+
+    _insert.onchange = () => {
+        if(_insert.checked) {
+            if(!_play.checked) {Insert.start()}
+        } else {
+            Insert.end();
         }
     }
-    if(!drawingHovered() && hoveredElement != _character) {return}
-    if(e.key.length > 1) {return}
-    Brush.character = e.key;
-}
+    function drawingHovered() {
+        return hoveredElement.getAttribute("class") == "pixel";
+    }
 
-Mouse.onMouseWheel = () => {
-    if(!drawingHovered() || Insert.active) {return}
-    brush.size += Mouse.wheel * 4;
+    setInterval(() => {
+        if(_play.checked) {return}
+        hoveredElement = document.elementFromPoint(Mouse.x, Mouse.y);
+        if(Insert.active) {return}
+        let pixelPos = getXYofPixel(hoveredElement);
+        if(!pixelPos) {render(); return}
+        let drawingPreview = Drawing.clone(currentDrawing);
+        let previewSelection = new DrawingSelection(drawingPreview);
+        previewSelection.rect(...brush.dimensions(pixelPos.x, pixelPos.y));
+        previewSelection.setPixels(() => Brush.character);
+        if(Mouse.leftClick) {
+            currentDrawing = Drawing.clone(drawingPreview);
+        }
+        render(
+            getCurrentLayers()
+                .map((x, i) => i === layers.layer ? drawingPreview : x)
+        );
+    }, 50);
+
+    onkeydown = e => {
+        if(Insert.active) {return}
+        if(e.key.startsWith("Arrow")) {
+            switch(e.key) {
+                case "ArrowUp":
+                    layers.layer -= 1;
+                    break;
+                case "ArrowDown":
+                    layers.layer += 1;
+                    break;
+                case "ArrowRight":
+                    _Animation.frame += 1;
+                    break;
+                case "ArrowLeft":
+                    _Animation.frame -= 1;
+                    break;
+            }
+        }
+        if(!drawingHovered() && hoveredElement != _character) {return}
+        if(e.key.length > 1) {return}
+        Brush.character = e.key;
+    }
+
+    Mouse.onMouseWheel = () => {
+        if(!drawingHovered() || Insert.active) {return}
+        brush.size += Mouse.wheel * 4;
+    }
 }
