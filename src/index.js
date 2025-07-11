@@ -234,24 +234,23 @@ class Brush {
 }
 
 class Layers {
-    renderTimeline() {
+    initTimeline() {
         let rendered = "";
         for(let j = 0; j < this.#layers.length; j++) {
             rendered += "<div class='layer'>";
             for(let i = 0; i < _Animation.length; i++) {
-                rendered += `<div ${i === _Animation.frame && j === this.#layer ? "class='timeline-selected'" : ""}
-                    onclick="layers.layer = ${j}; _Animation.frame = ${i}";>${i + 1}</div>`;
+                rendered += `<div 
+                    onclick="layers.layer = ${j}; _Animation.frame = ${i}; renderTimeline()"
+                >${i + 1}</div>`;
             }
             rendered += "</div>";
         }
         _timeline.innerHTML = rendered;
     }
     #layer = 0;
+
     set layer(layer) {
-        const layersDOM = _timeline.children;
-        layersDOM[this.#layer].children[_Animation.frame].classList.remove("timeline-selected");
-        this.#layer = mod(layer, this.#layers.length);
-        layersDOM[this.#layer].children[_Animation.frame].classList.add("timeline-selected");
+        this.#layer = mod(layer, layers.layers.length);
     }
     get layer() {return this.#layer}
     
@@ -368,6 +367,18 @@ function render(layers = null) {
     }
     rendered.render();
 }
+function renderTimeline() {
+    const layersDOM = [...(_timeline.children)];
+    $$(".layer > div").forEach(el => el.className = "");
+    $$(`.layer > div:nth-child(${_Animation.frame + 1})`).forEach(el => {
+        el.className = "timeline-selected-same-column";
+    });
+    $$(`.layer:nth-child(${layers.layer + 1}) > div`).forEach(el => {
+        el.className = "timeline-selected-same-row"
+    })
+    $(`.layer:nth-child(${layers.layer + 1}) > div:nth-child(${_Animation.frame + 1})`)
+        .className = "timeline-selected";
+}
 
 let pixelRect;
 let pixelWidth;
@@ -380,7 +391,8 @@ function start() {
     Drawing.width = Number(_settings_width.value);
     Drawing.height = Number(_settings_height.value);
     layers = new Layers(" ", Number(_settings_layers.value));
-    layers.renderTimeline();
+    layers.initTimeline();
+    renderTimeline();
     currentDrawing.render();
     pixelRect = $(".pixel").getBoundingClientRect();
     pixelWidth = pixelRect.width;
@@ -398,6 +410,7 @@ function start() {
             _play.setAttribute("data-setintervalid", setInterval(() => {
                 _Animation.frame += 1;
                 render();
+                renderTimeline();
             }, 100));
         } else {
             if(_insert.checked) {
@@ -454,6 +467,7 @@ function start() {
                     _Animation.frame -= 1;
                     break;
             }
+            renderTimeline();
         }
         if(!drawingHovered() && hoveredElement != _character) {return}
         if(e.key.length > 1) {return}

@@ -65,3 +65,9 @@ body {
 .timeline-selected {
     background-color: lightblue;
 }
+.timeline-selected-same-row {
+    background-color: rgb(235, 254, 255);
+}
+.timeline-selected-same-column {
+    background-color: rgb(216, 236, 255);
+}
