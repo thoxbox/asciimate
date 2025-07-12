@@ -406,7 +406,7 @@ function start() {
             clearInterval(_play.getAttribute("data-setintervalid"));
         }
     };
-
+    
     _insert.onchange = () => {
         if(_insert.checked) {
             if(!_play.checked) {Insert.start()}
@@ -414,10 +414,12 @@ function start() {
             Insert.end();
         }
     }
+    
     function drawingHovered() {
-        return hoveredElement.getAttribute("class") == "pixel";
+        return hoveredElement === null ? false :
+            hoveredElement.getAttribute("class") === "pixel";
     }
-
+    
     setInterval(() => {
         if(_play.checked) {return}
         hoveredElement = document.elementFromPoint(Mouse.x, Mouse.y);
