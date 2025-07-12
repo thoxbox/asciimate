@@ -449,9 +449,11 @@ function start() {
                     break;
                 case "ArrowRight":
                     _Animation.frame += 1;
+                    e.preventDefault();
                     break;
                 case "ArrowLeft":
                     _Animation.frame -= 1;
+                    e.preventDefault();
                     break;
             }
         }
