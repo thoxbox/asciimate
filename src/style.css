@@ -48,6 +48,25 @@ body {
 #_timeline {
     overflow-x: scroll;
 }
+.timeline-numbers {
+    display: grid;
+    grid-auto-flow: column dense;
+    grid-auto-columns: 20px;
+    height: fit-content;
+    counter-reset: timeline-number;
+}
+.timeline-numbers > div {
+    font-size: small;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    counter-increment: timeline-number 1;
+}
+.timeline-numbers > div::after {
+    content: counter(timeline-number);
+}
 .layer {
     display: grid;
     grid-auto-flow: column dense;

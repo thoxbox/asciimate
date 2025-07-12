@@ -390,15 +390,20 @@ class Timeline extends HTMLElement {
     static #initInnerHTML = "";
     static #elementLoaded = false;
     static #init = () => {
+        this.#initInnerHTML += `<div class="timeline-numbers">
+            ${"<div></div>".repeat(_Animation.length)}
+        </div>
+        <div>`;
         for(let j = 0; j < layers.layers.length; j++) {
             this.#initInnerHTML += "<div class='layer'>";
             for(let i = 0; i < _Animation.length; i++) {
                 this.#initInnerHTML += `<div 
                     onclick="Timeline.set(${i}, ${j})"
-                >${i + 1}</div>`;
+                ></div>`;
             }
             this.#initInnerHTML += "</div>";
         }
+        this.#initInnerHTML += "</div>"
     }
     connectedCallback() {
         if(!Timeline.#elementLoaded) {
