@@ -48,14 +48,18 @@ body {
 #_timeline {
     overflow-x: scroll;
 }
-.timeline-numbers {
+#_timeline_layers {
+    display: flex;
+    flex-direction: column-reverse;
+}
+#_timeline_numbers {
     display: grid;
     grid-auto-flow: column dense;
     grid-auto-columns: 20px;
     height: fit-content;
     counter-reset: timeline-number;
 }
-.timeline-numbers > div {
+#_timeline_numbers > div {
     font-size: small;
     width: 20px;
     height: 20px;
@@ -64,7 +68,7 @@ body {
     align-items: center;
     counter-increment: timeline-number 1;
 }
-.timeline-numbers > div::after {
+#_timeline_numbers > div::after {
     content: counter(timeline-number);
 }
 .layer {

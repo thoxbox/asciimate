@@ -262,6 +262,7 @@ class Layers {
         this.#layers = layers !== null ? layers :
             this.#layers = new Array(layerAmount).fill()
             .map(x => new _Animation(fillCharacter));
+        this.#layer = this.#layers.length - 1;
     }
     
     get current() {return this.#layers[this.#layer].current}
@@ -390,10 +391,10 @@ class Timeline extends HTMLElement {
     static #initInnerHTML = "";
     static #elementLoaded = false;
     static #init = () => {
-        this.#initInnerHTML += `<div class="timeline-numbers">
+        this.#initInnerHTML += `<div id="_timeline_numbers">
             ${"<div></div>".repeat(_Animation.length)}
         </div>
-        <div>`;
+        <div id="_timeline_layers">`;
         for(let j = 0; j < layers.layers.length; j++) {
             this.#initInnerHTML += "<div class='layer'>";
             for(let i = 0; i < _Animation.length; i++) {
@@ -489,10 +490,10 @@ function start() {
         if(e.key.startsWith("Arrow")) {
             switch(e.key) {
                 case "ArrowUp":
-                    Timeline.move(0, -1);
+                    Timeline.move(0, 1);
                     break;
                 case "ArrowDown":
-                    Timeline.move(0, 1);
+                    Timeline.move(0, -1);
                     break;
                 case "ArrowRight":
                     Timeline.move(1, 0);
