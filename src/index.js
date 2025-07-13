@@ -434,6 +434,35 @@ class Toggle extends HTMLElement {
     }
 }
 customElements.define("toggle-", Toggle);
+class OptionButton extends HTMLElement {
+    checked = false;
+    name = "";
+    setChecked(bool) {
+        if(bool === this.checked) {
+            return;
+        }
+        this.onchange();
+        if(bool) {
+            const options = $$(`option-[name="${this.name}"]`);
+            OptionButton.onswitch([...options].indexOf(this), this.name);
+            $$(`option-[name="${this.name}"]`).forEach(el => el.setChecked(false));
+        }
+        this.checked = bool;
+        this.setAttribute("checked", this.checked);
+    }
+    onchange = () => {};
+    static onswitch = () => {};
+    connectedCallback() {
+        this.style.display = 'block';
+        this.name = this.getAttribute("name");
+        this.checked = !!this.getAttribute("checked");
+        this.setAttribute("checked", this.checked);
+        this.onclick = () => {
+            this.setChecked(true);
+        }
+    }
+}
+customElements.define("option-", OptionButton);
 
 let pixelRect;
 let pixelWidth;
@@ -458,7 +487,7 @@ function start() {
     
     _play.onchange = e => {
         if(_play.checked) {
-            if(_insert.checked) {
+            if(_tools_insert.checked) {
                 Insert.end();
             }
             _play.setAttribute("data-setintervalid", setInterval(() => {
@@ -466,19 +495,22 @@ function start() {
                 render();
             }, 100));
         } else {
-            if(_insert.checked) {
+            if(_tools_insert.checked) {
                 Insert.start();
             }
             clearInterval(_play.getAttribute("data-setintervalid"));
         }
     };
     
-    _insert.onchange = () => {
-        if(_insert.checked) {
-            if(!_play.checked) {Insert.start()}
-        } else {
-            Insert.end();
+    OptionButton.onswitch = (index, name) => {
+        if(name !== "tools") {
+            return;
         }
+        if(index === 1) {
+            if(!_play.checked) {Insert.start()}
+            return;
+        }
+        Insert.end();
     }
     function drawingHovered() {
         return hoveredElement.getAttribute("class") === "pixel";

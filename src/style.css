@@ -101,13 +101,16 @@ body {
 #_navigation_container {
     border: 1px solid black;
     padding: 4px;
+    display: flex;
+    flex-direction: row;
+    gap: 4px;
 }
 #_play {
     width: 20px;
     height: 20px;
     background-repeat: no-repeat;
     background-position: 50%;
-    background-size: 65%;
+    background-size: 10px;
     border: 1px solid black;
     border-radius: 0px;
 }
@@ -116,4 +119,25 @@ body {
 }
 #_play[checked = "false"] {
     background-image: url("../res/play.svg");
+}
+[name = "tools"] {
+    width: 20px;
+    height: 20px;
+    border: 1px solid black;
+    background-repeat: no-repeat;
+    background-position: 50%;
+}
+[name = "tools"][checked = "true"] {
+    background-color: lightblue;
+}
+[name = "tools"][checked = "false"] {
+    background-color: white;
+}
+#_tools_insert {
+    background-size: 40%;
+    background-image: url(../res/i-cursor.svg);
+}
+#_tools_brush {
+    background-size: 80%;
+    background-image: url(../res/paintbrush.svg);
 }
