@@ -22,6 +22,57 @@ body {
     border: 2px solid black;
     border-radius: 8px;
 }
+#_copy {
+    position: relative;
+    top: 0%;
+    left: 100%;
+    transform: translate(-40%, -40%);
+    border: 1px solid black;
+    background: 
+        white
+        url("../res/copy.svg")
+        no-repeat 50% 50%;
+    background-size: 10px;
+    width: 20px;
+    height: 20px;
+    transition: background-color 0.5s;
+}
+#_copy:active {
+    background-color: greenyellow;
+    transition: none;
+}
+#_copy::after, #_copy::before {
+    opacity: 0;
+    transition: opacity 0.5s;
+}
+#_copy:active::after, #_copy:active::before {
+    opacity: 1;
+    transition: none;
+}
+#_copy::after {
+    content: "Copied!";
+    position: relative;
+    display: block;
+    width: fit-content;
+    height: fit-content;
+    background-color: rgb(22, 218, 51);
+    border-radius: 2px;
+    left: -100%;
+    top: 25px;
+    padding: 2px;
+    transform: translateX(calc(10px - 50%));
+    opacity: 0;
+    transition: opacity 0.5s;
+}
+#_copy::before {
+    position: absolute;
+    content: "";
+    transform: translate(-50%, 20px);
+    width: 10px;
+    height: 5px;
+    background-color: rgb(22, 218, 51);
+    clip-path: polygon(50% 0, 100% 100%, 0 100%);
+}
 #_character {
     font-family: monospace;
     display: inline;

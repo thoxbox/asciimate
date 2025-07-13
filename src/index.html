@@ -35,9 +35,11 @@
                 <option- id="_tools_brush" name="tools" checked="true"></option->
                 <option- id="_tools_insert" id="hello" name="tools"></option->
             </div>
-            <button onclick="navigator.clipboard.writeText(_drawing.textContent)">Copy to clipboard</button>
         </div>
-        <pre id="_drawing"></pre>
+        <div id="_drawing_container">
+            <pre id="_drawing"></pre>
+            <button onclick="navigator.clipboard.writeText(_drawing.textContent)" id="_copy"></button>
+        </div>
     </div>
     <div id="_navigation_container">
         <toggle- id="_play"></toggle->
