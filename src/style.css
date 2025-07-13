@@ -8,6 +8,8 @@ body {
     display: flex;
     flex-direction: row;
     gap: 4px;
+    border: 1px solid black;
+    padding: 4px;
 }
 #_drawing {
     width: fit-content;
@@ -47,6 +49,8 @@ body {
 }
 #_timeline {
     overflow-x: scroll;
+    border: 1px solid black;
+    padding: 4px;
 }
 #_timeline_layers {
     display: flex;
@@ -93,4 +97,23 @@ body {
 }
 .timeline-selected-same-column {
     background-color: rgb(216, 236, 255);
+}
+#_navigation_container {
+    border: 1px solid black;
+    padding: 4px;
+}
+#_play {
+    width: 20px;
+    height: 20px;
+    background-repeat: no-repeat;
+    background-position: 50%;
+    background-size: 65%;
+    border: 1px solid black;
+    border-radius: 0px;
+}
+#_play[checked = "true"] {
+    background-image: url("../res/pause.svg");
+}
+#_play[checked = "false"] {
+    background-image: url("../res/play.svg");
 }

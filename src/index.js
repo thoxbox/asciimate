@@ -416,6 +416,24 @@ class Timeline extends HTMLElement {
     }
 }
 customElements.define("timeline-", Timeline);
+class Toggle extends HTMLElement {
+    #checked = false;
+    set checked(bool) {
+        this.#checked = bool;
+        this.setAttribute("checked", this.checked);
+    }
+    get checked() {return this.#checked}
+    onchange = () => {}
+    connectedCallback() {
+        this.style.display = 'block';
+        this.checked = !!this.getAttribute("checked");
+        this.onclick = () => {
+            this.checked = !this.checked;
+            this.onchange();
+        }
+    }
+}
+customElements.define("toggle-", Toggle);
 
 let pixelRect;
 let pixelWidth;
@@ -438,7 +456,7 @@ function start() {
     hoveredElement = document.elementFromPoint(Mouse.x, Mouse.y);
     _settings.close();
     
-    _play.onchange = () => {
+    _play.onchange = e => {
         if(_play.checked) {
             if(_insert.checked) {
                 Insert.end();
@@ -454,7 +472,7 @@ function start() {
             clearInterval(_play.getAttribute("data-setintervalid"));
         }
     };
-
+    
     _insert.onchange = () => {
         if(_insert.checked) {
             if(!_play.checked) {Insert.start()}
