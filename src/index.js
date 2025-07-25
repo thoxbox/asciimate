@@ -512,10 +512,12 @@ function start() {
         }
         Insert.end();
     }
+    
     function drawingHovered() {
-        return hoveredElement.getAttribute("class") === "pixel";
+        return hoveredElement === null ? false :
+            hoveredElement.getAttribute("class") === "pixel";
     }
-
+    
     setInterval(() => {
         if(_play.checked) {return}
         hoveredElement = document.elementFromPoint(Mouse.x, Mouse.y);
@@ -547,9 +549,11 @@ function start() {
                     break;
                 case "ArrowRight":
                     Timeline.move(1, 0);
+                    e.preventDefault();
                     break;
                 case "ArrowLeft":
                     Timeline.move(-1, 0);
+                    e.preventDefault();
                     break;
             }
         }
