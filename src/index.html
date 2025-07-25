@@ -26,22 +26,26 @@
     </dialog>
     <code>Asciimate</code>
     <div id="c1">
-        <div>
-            <div style="display: flex; gap: 10px">
-                Character
-                <div id="_character" >a</div><br>
-            </div>
-            <div>
-                <title>hi</title>
-                <label for="_insert">Insert</label>
-                <input id="_insert" type="checkbox" name="tools"><br>
-            </div>
-            <button onclick="navigator.clipboard.writeText(_drawing.textContent)">Copy to clipboard</button>
+        <div id="_tools">
+            <option- id="_tools_brush" name="tools" checked="true"></option->
+            <option- id="_tools_insert" id="hello" name="tools"></option->
         </div>
-        <pre id="_drawing"></pre>
+        <div id="c2">
+            <div id="_ribbon">
+                <div id="_character_container">
+                    Character:
+                    <div id="_character">a</div>
+                </div>
+            </div>
+            <div id="_drawing_container">
+                <pre id="_drawing"></pre>
+                <button onclick="navigator.clipboard.writeText(_drawing.textContent)" id="_copy"></button>
+            </div>
+        </div>
     </div>
-    <label for="_play">Play</label>
-    <input id="_play" type="checkbox">
+    <div id="_navigation_container">
+        <toggle- id="_play"></toggle->
+    </div>
     <div id="_timeline"></div>
     <script src="index.js"></script>
 </body>

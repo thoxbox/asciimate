@@ -166,10 +166,7 @@ class _Animation {
         if(this.length === null) {
             throw new Error("_Animation.length must be set before modifying _Animation.frame.");
         }
-        const layerDOM = _timeline.children[layers.layer].children;
-        layerDOM[this.#frame].classList.remove("timeline-selected");
         this.#frame = mod(frame, this.length);
-        layerDOM[this.#frame].classList.add("timeline-selected");
     }
     static get frame() {return this.#frame}
     
@@ -234,24 +231,23 @@ class Brush {
 }
 
 class Layers {
-    renderTimeline() {
+    initTimeline() {
         let rendered = "";
         for(let j = 0; j < this.#layers.length; j++) {
             rendered += "<div class='layer'>";
             for(let i = 0; i < _Animation.length; i++) {
-                rendered += `<div ${i === _Animation.frame && j === this.#layer ? "class='timeline-selected'" : ""}
-                    onclick="layers.layer = ${j}; _Animation.frame = ${i}";>${i + 1}</div>`;
+                rendered += `<div 
+                    onclick="layers.layer = ${j}; _Animation.frame = ${i}; renderTimeline()"
+                >${i + 1}</div>`;
             }
             rendered += "</div>";
         }
         _timeline.innerHTML = rendered;
     }
     #layer = 0;
+
     set layer(layer) {
-        const layersDOM = _timeline.children;
-        layersDOM[this.#layer].children[_Animation.frame].classList.remove("timeline-selected");
-        this.#layer = mod(layer, this.#layers.length);
-        layersDOM[this.#layer].children[_Animation.frame].classList.add("timeline-selected");
+        this.#layer = mod(layer, layers.layers.length);
     }
     get layer() {return this.#layer}
     
@@ -266,6 +262,7 @@ class Layers {
         this.#layers = layers !== null ? layers :
             this.#layers = new Array(layerAmount).fill()
             .map(x => new _Animation(fillCharacter));
+        this.#layer = this.#layers.length - 1;
     }
     
     get current() {return this.#layers[this.#layer].current}
@@ -337,6 +334,7 @@ class Insert {
 }
 
 _settings.showModal();
+/** @type {Layers} */
 let layers;
 Object.defineProperty(window, "currentDrawing", {
     get () {return layers.current},
@@ -368,6 +366,103 @@ function render(layers = null) {
     }
     rendered.render();
 }
+class Timeline extends HTMLElement {
+    static move(amountX, amountY) {
+        _Animation.frame += amountX;
+        layers.layer += amountY;
+        this.#renderTimeline();
+    }
+    static set(x, y) {
+        _Animation.frame = x;
+        layers.layer = y;
+        this.#renderTimeline();
+    }
+    static #renderTimeline() {
+        $$(".layer > div").forEach(el => el.className = "");
+        $$(`.layer > div:nth-child(${_Animation.frame + 1})`).forEach(el => {
+            el.className = "timeline-selected-same-column";
+        });
+        $$(`.layer:nth-child(${layers.layer + 1}) > div`).forEach(el => {
+            el.className = "timeline-selected-same-row"
+        })
+        $(`.layer:nth-child(${layers.layer + 1}) > div:nth-child(${_Animation.frame + 1})`)
+            .className = "timeline-selected";
+    }
+    static #initInnerHTML = "";
+    static #elementLoaded = false;
+    static #init = () => {
+        this.#initInnerHTML += `<div id="_timeline_numbers">
+            ${"<div></div>".repeat(_Animation.length)}
+        </div>
+        <div id="_timeline_layers">`;
+        for(let j = 0; j < layers.layers.length; j++) {
+            this.#initInnerHTML += "<div class='layer'>";
+            for(let i = 0; i < _Animation.length; i++) {
+                this.#initInnerHTML += `<div 
+                    onclick="Timeline.set(${i}, ${j})"
+                ></div>`;
+            }
+            this.#initInnerHTML += "</div>";
+        }
+        this.#initInnerHTML += "</div>"
+    }
+    connectedCallback() {
+        if(!Timeline.#elementLoaded) {
+            Timeline.#elementLoaded = true;
+            Timeline.#init();
+        }
+        this.innerHTML = Timeline.#initInnerHTML;
+        Timeline.#renderTimeline();
+    }
+}
+customElements.define("timeline-", Timeline);
+class Toggle extends HTMLElement {
+    #checked = false;
+    set checked(bool) {
+        this.#checked = bool;
+        this.setAttribute("checked", this.checked);
+    }
+    get checked() {return this.#checked}
+    onchange = () => {}
+    connectedCallback() {
+        this.style.display = 'block';
+        this.checked = !!this.getAttribute("checked");
+        this.onclick = () => {
+            this.checked = !this.checked;
+            this.onchange();
+        }
+    }
+}
+customElements.define("toggle-", Toggle);
+class OptionButton extends HTMLElement {
+    checked = false;
+    name = "";
+    setChecked(bool) {
+        if(bool === this.checked) {
+            return;
+        }
+        this.onchange();
+        if(bool) {
+            const options = $$(`option-[name="${this.name}"]`);
+            OptionButton.onswitch([...options].indexOf(this), this.name);
+            $$(`option-[name="${this.name}"]`).forEach(el => el.setChecked(false));
+        }
+        this.checked = bool;
+        this.setAttribute("checked", this.checked);
+    }
+    onchange = () => {};
+    static onswitch = () => {};
+    connectedCallback() {
+        this.style.display = 'block';
+        this.name = this.getAttribute("name");
+        this.checked = !!this.getAttribute("checked");
+        this.setAttribute("checked", this.checked);
+        this.onclick = () => {
+            this.setChecked(true);
+        }
+    }
+}
+customElements.define("option-", OptionButton);
 
 let pixelRect;
 let pixelWidth;
@@ -380,7 +475,7 @@ function start() {
     Drawing.width = Number(_settings_width.value);
     Drawing.height = Number(_settings_height.value);
     layers = new Layers(" ", Number(_settings_layers.value));
-    layers.renderTimeline();
+    _timeline.innerHTML = '<timeline-></timeline->';
     currentDrawing.render();
     pixelRect = $(".pixel").getBoundingClientRect();
     pixelWidth = pixelRect.width;
@@ -389,30 +484,33 @@ function start() {
     brush = new Brush(3);
     hoveredElement = document.elementFromPoint(Mouse.x, Mouse.y);
     _settings.close();
-
-    _play.onchange = () => {
+    
+    _play.onchange = e => {
         if(_play.checked) {
-            if(_insert.checked) {
+            if(_tools_insert.checked) {
                 Insert.end();
             }
             _play.setAttribute("data-setintervalid", setInterval(() => {
-                _Animation.frame += 1;
+                Timeline.move(1, 0);
                 render();
             }, 100));
         } else {
-            if(_insert.checked) {
+            if(_tools_insert.checked) {
                 Insert.start();
             }
             clearInterval(_play.getAttribute("data-setintervalid"));
         }
     };
     
-    _insert.onchange = () => {
-        if(_insert.checked) {
-            if(!_play.checked) {Insert.start()}
-        } else {
-            Insert.end();
+    OptionButton.onswitch = (index, name) => {
+        if(name !== "tools") {
+            return;
         }
+        if(index === 1) {
+            if(!_play.checked) {Insert.start()}
+            return;
+        }
+        Insert.end();
     }
     
     function drawingHovered() {
@@ -444,17 +542,17 @@ function start() {
         if(e.key.startsWith("Arrow")) {
             switch(e.key) {
                 case "ArrowUp":
-                    layers.layer -= 1;
+                    Timeline.move(0, 1);
                     break;
                 case "ArrowDown":
-                    layers.layer += 1;
+                    Timeline.move(0, -1);
                     break;
                 case "ArrowRight":
-                    _Animation.frame += 1;
+                    Timeline.move(1, 0);
                     e.preventDefault();
                     break;
                 case "ArrowLeft":
-                    _Animation.frame -= 1;
+                    Timeline.move(-1, 0);
                     e.preventDefault();
                     break;
             }
