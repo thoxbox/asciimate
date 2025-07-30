@@ -379,15 +379,15 @@ class Timeline extends HTMLElement {
         this.#renderTimeline();
     }
     static #renderTimeline() {
-        $$(".layer > div").forEach(el => el.className = "");
-        $$(`.layer > div:nth-child(${_Animation.frame + 1})`).forEach(el => {
-            el.className = "timeline-selected-same-column";
+        $$(".timeline-item").forEach(el => el.className = "timeline-item");
+        $$(`.timeline-item:nth-child(${_Animation.frame + 1})`).forEach(el => {
+            el.classList.add("timeline-selected-same-column");
         });
         $$(`.layer:nth-child(${layers.layer + 1}) > div`).forEach(el => {
-            el.className = "timeline-selected-same-row"
-        })
+            el.classList.add("timeline-selected-same-row");
+        });
         $(`.layer:nth-child(${layers.layer + 1}) > div:nth-child(${_Animation.frame + 1})`)
-            .className = "timeline-selected";
+            .className = "timeline-item timeline-selected";
     }
     static #initInnerHTML = "";
     static #elementLoaded = false;
@@ -400,7 +400,9 @@ class Timeline extends HTMLElement {
             this.#initInnerHTML += "<div class='layer'>";
             for (let i = 0; i < _Animation.length; i++) {
                 this.#initInnerHTML += `<div 
-                    onclick="Timeline.set(${i}, ${j})"
+                    class="timeline-item"
+                    data-x="${i}"
+                    data-y="${j}"
                 ></div>`;
             }
             this.#initInnerHTML += "</div>";
@@ -413,6 +415,14 @@ class Timeline extends HTMLElement {
             Timeline.#init();
         }
         this.innerHTML = Timeline.#initInnerHTML;
+        this.addEventListener("click", e => {
+            if(!hoveredElement.classList.contains("timeline-item")) {
+                return;
+            }
+            const x = hoveredElement.getAttribute("data-x")
+            const y = hoveredElement.getAttribute("data-y")
+            Timeline.set(x, y);
+        })
         Timeline.#renderTimeline();
     }
 }
@@ -470,6 +480,11 @@ let pixelWidth;
 let pixelHeight;
 let brush;
 let hoveredElement;
+
+$("#_settings_form").addEventListener("submit", e => {
+    start();
+    e.preventDefault();
+}, {once: true});
 
 function start() {
     _Animation.length = Number(_settings_frames.value);

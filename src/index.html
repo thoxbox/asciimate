@@ -9,7 +9,7 @@
 </head>
 <body>
     <dialog id="_settings">
-        <form onsubmit="start(); return false">
+        <form id="_settings_form">
             Dimensions:
             <input min="1" value="20" type="number" id="_settings_width">
             X
@@ -47,6 +47,6 @@
         <toggle- id="_play"></toggle->
     </div>
     <div id="_timeline"></div>
-    <script src="index.js"></script>
+    <script src="index.js" type="module"></script>
 </body>
 </html>
