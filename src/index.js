@@ -19,6 +19,7 @@ const $ = query => document.querySelector(query);
 const $$ = query => document.querySelectorAll(query);
 
 import Mouse from "./mouse.js";
+import HoveredElement from "./HoveredElement.js";
 
 class Drawing {
     /** @type {number} */ static width = null;
@@ -235,7 +236,7 @@ class Insert {
     static advance() {
         _drawing.removeAttribute("data-insert");
         _drawing.removeAttribute("onclick");
-        this.#pixel = getXYofPixel(hoveredElement);
+        this.#pixel = getXYofPixel(HoveredElement.get());
         const _insertTextRendered = () => {
             _insertText.focus();
             _insertText.onkeydown = e => {
@@ -253,8 +254,8 @@ class Insert {
             _insertTextRendered();
             console.log("something happened");
         });
-        observer.observe(hoveredElement, { childList: true });
-        hoveredElement.innerHTML = `<div
+        observer.observe(HoveredElement.get(), { childList: true });
+        HoveredElement.get().innerHTML = `<div
                 style="
                     position: absolute; 
                     display: inline-block;"
@@ -262,8 +263,8 @@ class Insert {
             ><div
                 contenteditable
                 id="_insertText"
-            >${hoveredElement.innerHTML}</div></div>`
-            + hoveredElement.innerHTML;
+            >${HoveredElement.get().innerHTML}</div></div>`
+            + HoveredElement.get().innerHTML;
     }
     static render() {
         let text = _insertText.textContent;
@@ -369,11 +370,11 @@ class Timeline extends HTMLElement {
         }
         this.innerHTML = Timeline.#initInnerHTML;
         this.addEventListener("click", e => {
-            if(!hoveredElement.classList.contains("timeline-item")) {
+            if(!HoveredElement.get().classList.contains("timeline-item")) {
                 return;
             }
-            const x = hoveredElement.getAttribute("data-x")
-            const y = hoveredElement.getAttribute("data-y")
+            const x = HoveredElement.get().getAttribute("data-x")
+            const y = HoveredElement.get().getAttribute("data-y")
             Timeline.set(x, y);
         })
         Timeline.#renderTimeline();
@@ -432,7 +433,6 @@ let pixelRect;
 let pixelWidth;
 let pixelHeight;
 let brush;
-let hoveredElement;
 
 $("#_settings_form").addEventListener("submit", e => {
     start();
@@ -451,7 +451,7 @@ function start() {
     pixelHeight = pixelRect.height;
     Brush.character = "a";
     brush = new Brush(3);
-    hoveredElement = document.elementFromPoint(Mouse.x, Mouse.y);
+    HoveredElement.update();
     _settings.close();
 
     _play.onchange = e => {
@@ -483,15 +483,15 @@ function start() {
     }
 
     function drawingHovered() {
-        return hoveredElement === null ? false :
-            hoveredElement.getAttribute("class") === "pixel";
+        return HoveredElement.get() === null ? false :
+            HoveredElement.get().getAttribute("class") === "pixel";
     }
 
     setInterval(() => {
         if (_play.checked) { return }
-        hoveredElement = document.elementFromPoint(Mouse.x, Mouse.y);
+        HoveredElement.update();
         if (Insert.active) { return }
-        let pixelPos = getXYofPixel(hoveredElement);
+        let pixelPos = getXYofPixel(HoveredElement.get());
         if (!pixelPos) { render(); return }
         let drawingPreview = Drawing.clone(currentDrawing);
         let previewSelection = new DrawingSelection(drawingPreview);
