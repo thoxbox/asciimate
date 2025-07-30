@@ -229,13 +229,14 @@ class Insert {
     static start() {
         this.active = true;
         _drawing.setAttribute("data-insert", "");
-        _drawing.setAttribute("onclick", "Insert.advance()");
+        _drawing.addEventListener("click", () => {
+            Insert.advance();
+        }, {once: true});
     }
     /** @type {{x: number, y: number}} */
     static #pixel;
     static advance() {
         _drawing.removeAttribute("data-insert");
-        _drawing.removeAttribute("onclick");
         this.#pixel = getXYofPixel(HoveredElement.get());
         const _insertTextRendered = () => {
             _insertText.focus();
