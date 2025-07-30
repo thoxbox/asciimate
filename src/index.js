@@ -25,23 +25,23 @@ class Drawing {
     #drawing;
     /** @param {string} fillCharacter @param {string[][]} drawing */
     constructor(fillCharacter, drawing = null) {
-        if(Drawing.width === null || Drawing.height === null) {
+        if (Drawing.width === null || Drawing.height === null) {
             throw new Error("Drawing.width and Drawing.height must be set before creating a Drawing object.");
         }
-        this.#drawing = drawing ? drawing : 
+        this.#drawing = drawing ? drawing :
             Array(Drawing.height).fill().map(x => Array(Drawing.width).fill(fillCharacter));
     }
-    get drawing() {return structuredClone(this.#drawing)}
+    get drawing() { return structuredClone(this.#drawing) }
     /** @param {number} x @param {number} y @param {string} character */
     setPixel(x, y, character) {
-        if(!(inRange(x, 0, Drawing.width - 1) && inRange(y, 0, Drawing.height - 1))) {
+        if (!(inRange(x, 0, Drawing.width - 1) && inRange(y, 0, Drawing.height - 1))) {
             return;
         }
         this.#drawing[y][x] = character;
     }
     /** @param {number} x @param {number} y */
     getPixel(x, y) {
-        if(!(inRange(x, 0, Drawing.width - 1) && inRange(y, 0, Drawing.height - 1))) {
+        if (!(inRange(x, 0, Drawing.width - 1) && inRange(y, 0, Drawing.height - 1))) {
             return;
         }
         return this.#drawing[y][x];
@@ -49,8 +49,8 @@ class Drawing {
     render() {
         _drawing.innerHTML = this.#drawing.map((x, i) => {
             return x
-            .map(x => `<span class="pixel">${x}</span>`)
-            .join("") + "\n"
+                .map(x => `<span class="pixel">${x}</span>`)
+                .join("") + "\n"
         }).join("");
     }
     /** @param {Drawing} drawing */
@@ -72,14 +72,14 @@ class DrawingSelection {
     }
     /** @param {number} x @param {number} y */
     pixel(x, y) {
-        if(inRange(x, 0, Drawing.width - 1) && inRange(y, 0, Drawing.height - 1)) {
-            this.#selection.push({x: x, y: y});
+        if (inRange(x, 0, Drawing.width - 1) && inRange(y, 0, Drawing.height - 1)) {
+            this.#selection.push({ x: x, y: y });
         }
     }
     /** @param {number} x1 @param {number} y1 @param {number} x2 @param {number} y2 */
     rect(x1, y1, x2, y2) {
-        for(let y = y1; y <= y2; y++) {
-            for(let x = x1; x <= x2; x++) {
+        for (let y = y1; y <= y2; y++) {
+            for (let x = x1; x <= x2; x++) {
                 this.pixel(x, y);
             }
         }
@@ -98,12 +98,13 @@ class DrawingSelection {
             i.x, i.y, callbackfn(
                 this.drawing.getPixel(i.x, i.y)
                 , i.x, i.y
-        )));
+            )
+        ));
     }
     /** @param {(character: string, x: number, y: number) => boolean} callbackfn */
     filterPixels(callbackfn) {
         this.drawing.drawing.forEach((line, y) => line.forEach((char, x) => {
-            if(callbackfn(char, x, y)) {
+            if (callbackfn(char, x, y)) {
                 this.pixel(x, y);
             }
         }))
@@ -112,22 +113,22 @@ class DrawingSelection {
 
 class Mouse {
     static #leftClick = false;
-    static get leftClick() {return this.#leftClick}
+    static get leftClick() { return this.#leftClick }
     static #rightClick = false;
-    static get rightClick() {return this.#rightClick}
+    static get rightClick() { return this.#rightClick }
     static #middleClick = false;
-    static get middleClick() {return this.#middleClick}
+    static get middleClick() { return this.#middleClick }
     static #x = 0;
-    static get x() {return this.#x}
+    static get x() { return this.#x }
     static #y = 0;
-    static get y() {return this.#y}
+    static get y() { return this.#y }
     /** @type {-1 | 0 | 1} */
     static #wheel = 0;
-    static get wheel() {return this.#wheel}
-    static onMouseDown  = () => {};
-    static onMouseUp    = () => {};
-    static onMouseMove  = () => {};
-    static onMouseWheel = () => {};
+    static get wheel() { return this.#wheel }
+    static onMouseDown = () => { };
+    static onMouseUp = () => { };
+    static onMouseMove = () => { };
+    static onMouseWheel = () => { };
     /** @param {number} buttons */
     static #setButtonsFromMouseEvent(buttons) {
         const buttonsBinary = buttons
@@ -141,59 +142,59 @@ class Mouse {
         document.addEventListener("mousedown", e => {
             this.#setButtonsFromMouseEvent(e.buttons);
             this.onMouseDown();
-        }, {passive: true});
+        }, { passive: true });
         document.addEventListener("mouseup", e => {
             this.#setButtonsFromMouseEvent(e.buttons);
             this.onMouseUp();
-        }, {passive: true});
+        }, { passive: true });
         document.addEventListener("mousemove", e => {
             this.#x = e.clientX;
             this.#y = e.clientY;
             this.onMouseMove();
-        }, {passive: true});
+        }, { passive: true });
         const mouseWheel = (e) => {
-            if(e.deltaY != null) {this.#wheel = Math.sign(e.deltaY)}
+            if (e.deltaY != null) { this.#wheel = Math.sign(e.deltaY) }
             this.onMouseWheel();
         }
-        document.addEventListener("wheel", mouseWheel, {passive: true});
-        document.addEventListener("DOMMouseScroll", mouseWheel, {passive: true});
+        document.addEventListener("wheel", mouseWheel, { passive: true });
+        document.addEventListener("DOMMouseScroll", mouseWheel, { passive: true });
     })()
 }
 class _Animation {
     /**@type {number}*/ static length = null;
     static #frame = 0;
     static set frame(frame) {
-        if(this.length === null) {
+        if (this.length === null) {
             throw new Error("_Animation.length must be set before modifying _Animation.frame.");
         }
         this.#frame = mod(frame, this.length);
     }
-    static get frame() {return this.#frame}
-    
+    static get frame() { return this.#frame }
+
     /** @type {Drawing[]} */
     #animation;
-    
+
     /**  @param {string} fillCharacter @param {Drawing[]} animation*/
     constructor(fillCharacter, animation = null) {
-        if(_Animation.length === null) {
+        if (_Animation.length === null) {
             throw new Error("_Animation.length must be set before creating an _Animation object.");
         }
         this.#animation = animation !== null ? animation :
             this.#animation = new Array(_Animation.length).fill()
-            .map(x => new Drawing(fillCharacter));
+                .map(x => new Drawing(fillCharacter));
     }
-    
-    get current() {return this.#animation[_Animation.frame]}
-    set current(drawing) {this.#animation[_Animation.frame] = drawing}
-    
-    get animation() {return this.#animation}
+
+    get current() { return this.#animation[_Animation.frame] }
+    set current(drawing) { this.#animation[_Animation.frame] = drawing }
+
+    get animation() { return this.#animation }
 }
 
 class Brush {
     #size;
     /** @type {number}*/ #width;
     /** @type {number}*/ #height;
-    
+
     /** @param {number} brushSize */
     constructor(brushSize) {
         this.#size = clamp(brushSize, 1, pixelWidth * Drawing.width);
@@ -204,8 +205,8 @@ class Brush {
         this.#size = clamp(value, 1, pixelWidth * Drawing.width);
         this.#calculateDimensions();
     }
-    get size() {return this.#size}
-    
+    get size() { return this.#size }
+
     /** @param {number} x @param {number} y */
     dimensions(x, y) {
         return [
@@ -233,9 +234,9 @@ class Brush {
 class Layers {
     initTimeline() {
         let rendered = "";
-        for(let j = 0; j < this.#layers.length; j++) {
+        for (let j = 0; j < this.#layers.length; j++) {
             rendered += "<div class='layer'>";
-            for(let i = 0; i < _Animation.length; i++) {
+            for (let i = 0; i < _Animation.length; i++) {
                 rendered += `<div 
                     onclick="layers.layer = ${j}; _Animation.frame = ${i}; renderTimeline()"
                 >${i + 1}</div>`;
@@ -249,25 +250,25 @@ class Layers {
     set layer(layer) {
         this.#layer = mod(layer, layers.layers.length);
     }
-    get layer() {return this.#layer}
-    
+    get layer() { return this.#layer }
+
     /** @type {(_Animation | Drawing)[]} */ #layers;
-    get layers() {return this.#layers}
-    
+    get layers() { return this.#layers }
+
     /**  @param {string} fillCharacter @param {(_Animation | Drawing)[]} layers*/
     constructor(fillCharacter, layerAmount, layers = null) {
-        if(layers !== null) {
+        if (layers !== null) {
             this.#layers = layers;
         }
         this.#layers = layers !== null ? layers :
             this.#layers = new Array(layerAmount).fill()
-            .map(x => new _Animation(fillCharacter));
+                .map(x => new _Animation(fillCharacter));
         this.#layer = this.#layers.length - 1;
     }
-    
-    get current() {return this.#layers[this.#layer].current}
+
+    get current() { return this.#layers[this.#layer].current }
     /** @param {Drawing} drawing */
-    set current(drawing) {this.#layers[this.#layer].current = drawing}
+    set current(drawing) { this.#layers[this.#layer].current = drawing }
 }
 
 class Insert {
@@ -313,8 +314,8 @@ class Insert {
     }
     static render() {
         let text = _insertText.textContent;
-        for(const [y, line] of text.split("\n").entries()) {
-            for(const [x, char] of line.split("").entries()) {
+        for (const [y, line] of text.split("\n").entries()) {
+            for (const [x, char] of line.split("").entries()) {
                 currentDrawing.setPixel(this.#pixel.x + x, this.#pixel.y + y, char);
             }
         }
@@ -337,28 +338,28 @@ _settings.showModal();
 /** @type {Layers} */
 let layers;
 Object.defineProperty(window, "currentDrawing", {
-    get () {return layers.current},
-    set (value) {layers.current = value},
+    get() { return layers.current },
+    set(value) { layers.current = value },
 });
 /** @param {Element} pixelNode */
 function getXYofPixel(pixelNode) {
     const index = [...$$(".pixel")].indexOf(pixelNode);
-    if(index == -1) {return}
+    if (index == -1) { return }
     return {
         x: index % Drawing.width,
         y: Math.floor(index / Drawing.width)
     };
 }
 function getCurrentLayers() {
-        return layers.layers.map(x => x.current);
+    return layers.layers.map(x => x.current);
 }
 /** @param {Drawing[]} layers */
 function render(layers = null) {
-    if(layers === null) {
+    if (layers === null) {
         layers = getCurrentLayers();
     }
     let rendered = new Drawing(" ");
-    for(let i of layers) {
+    for (let i of layers) {
         let selection = new DrawingSelection(i);
         selection.filterPixels(x => x !== " ");
         selection.drawing = rendered;
@@ -395,9 +396,9 @@ class Timeline extends HTMLElement {
             ${"<div></div>".repeat(_Animation.length)}
         </div>
         <div id="_timeline_layers">`;
-        for(let j = 0; j < layers.layers.length; j++) {
+        for (let j = 0; j < layers.layers.length; j++) {
             this.#initInnerHTML += "<div class='layer'>";
-            for(let i = 0; i < _Animation.length; i++) {
+            for (let i = 0; i < _Animation.length; i++) {
                 this.#initInnerHTML += `<div 
                     onclick="Timeline.set(${i}, ${j})"
                 ></div>`;
@@ -407,7 +408,7 @@ class Timeline extends HTMLElement {
         this.#initInnerHTML += "</div>"
     }
     connectedCallback() {
-        if(!Timeline.#elementLoaded) {
+        if (!Timeline.#elementLoaded) {
             Timeline.#elementLoaded = true;
             Timeline.#init();
         }
@@ -422,8 +423,8 @@ class Toggle extends HTMLElement {
         this.#checked = bool;
         this.setAttribute("checked", this.checked);
     }
-    get checked() {return this.#checked}
-    onchange = () => {}
+    get checked() { return this.#checked }
+    onchange = () => { }
     connectedCallback() {
         this.style.display = 'block';
         this.checked = !!this.getAttribute("checked");
@@ -438,11 +439,11 @@ class OptionButton extends HTMLElement {
     checked = false;
     name = "";
     setChecked(bool) {
-        if(bool === this.checked) {
+        if (bool === this.checked) {
             return;
         }
         this.onchange();
-        if(bool) {
+        if (bool) {
             const options = $$(`option-[name="${this.name}"]`);
             OptionButton.onswitch([...options].indexOf(this), this.name);
             $$(`option-[name="${this.name}"]`).forEach(el => el.setChecked(false));
@@ -450,8 +451,8 @@ class OptionButton extends HTMLElement {
         this.checked = bool;
         this.setAttribute("checked", this.checked);
     }
-    onchange = () => {};
-    static onswitch = () => {};
+    onchange = () => { };
+    static onswitch = () => { };
     connectedCallback() {
         this.style.display = 'block';
         this.name = this.getAttribute("name");
@@ -484,10 +485,10 @@ function start() {
     brush = new Brush(3);
     hoveredElement = document.elementFromPoint(Mouse.x, Mouse.y);
     _settings.close();
-    
+
     _play.onchange = e => {
-        if(_play.checked) {
-            if(_tools_insert.checked) {
+        if (_play.checked) {
+            if (_tools_insert.checked) {
                 Insert.end();
             }
             _play.setAttribute("data-setintervalid", setInterval(() => {
@@ -495,40 +496,40 @@ function start() {
                 render();
             }, 100));
         } else {
-            if(_tools_insert.checked) {
+            if (_tools_insert.checked) {
                 Insert.start();
             }
             clearInterval(_play.getAttribute("data-setintervalid"));
         }
     };
-    
+
     OptionButton.onswitch = (index, name) => {
-        if(name !== "tools") {
+        if (name !== "tools") {
             return;
         }
-        if(index === 1) {
-            if(!_play.checked) {Insert.start()}
+        if (index === 1) {
+            if (!_play.checked) { Insert.start() }
             return;
         }
         Insert.end();
     }
-    
+
     function drawingHovered() {
         return hoveredElement === null ? false :
             hoveredElement.getAttribute("class") === "pixel";
     }
-    
+
     setInterval(() => {
-        if(_play.checked) {return}
+        if (_play.checked) { return }
         hoveredElement = document.elementFromPoint(Mouse.x, Mouse.y);
-        if(Insert.active) {return}
+        if (Insert.active) { return }
         let pixelPos = getXYofPixel(hoveredElement);
-        if(!pixelPos) {render(); return}
+        if (!pixelPos) { render(); return }
         let drawingPreview = Drawing.clone(currentDrawing);
         let previewSelection = new DrawingSelection(drawingPreview);
         previewSelection.rect(...brush.dimensions(pixelPos.x, pixelPos.y));
         previewSelection.setPixels(() => Brush.character);
-        if(Mouse.leftClick) {
+        if (Mouse.leftClick) {
             currentDrawing = Drawing.clone(drawingPreview);
         }
         render(
@@ -538,9 +539,9 @@ function start() {
     }, 50);
 
     onkeydown = e => {
-        if(Insert.active) {return}
-        if(e.key.startsWith("Arrow")) {
-            switch(e.key) {
+        if (Insert.active) { return }
+        if (e.key.startsWith("Arrow")) {
+            switch (e.key) {
                 case "ArrowUp":
                     Timeline.move(0, 1);
                     break;
@@ -557,13 +558,13 @@ function start() {
                     break;
             }
         }
-        if(!drawingHovered() && hoveredElement != _character) {return}
-        if(e.key.length > 1) {return}
+        if (!drawingHovered() && hoveredElement != _character) { return }
+        if (e.key.length > 1) { return }
         Brush.character = e.key;
     }
 
     Mouse.onMouseWheel = () => {
-        if(!drawingHovered() || Insert.active) {return}
+        if (!drawingHovered() || Insert.active) { return }
         brush.size += Mouse.wheel * 4;
     }
 }
