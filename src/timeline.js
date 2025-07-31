@@ -47,19 +47,19 @@ class Layers {
     }
     static length = null;
 
-    #layer = 0;
+    static #layer = 0;
 
-    set layer(layer) {
+    static set layer(layer) {
         this.#layer = mod(layer, Layers.length);
     }
-    get layer() { return this.#layer }
+    static get layer() { return this.#layer }
 
     /** @type {(_Animation | Drawing)[]} */ #layers;
     get layers() { return this.#layers }
 
     /**  @param {string} fillCharacter @param {(_Animation | Drawing)[]} layers*/
     constructor(fillCharacter, layers = null) {
-        if (_Animation.length === null) {
+        if (_Animation.Glength === null) {
             throw new Error("Layers.length must be set before creating a Layers object.");
         }
         if (layers !== null) {
@@ -68,12 +68,12 @@ class Layers {
         this.#layers = layers !== null ? layers :
             this.#layers = new Array(Layers.length).fill()
                 .map(x => new _Animation(fillCharacter));
-        this.#layer = Layers.length - 1;
+        Layers.#layer = Layers.length - 1;
     }
 
-    get current() { return this.#layers[this.#layer].current }
+    get current() { return this.#layers[Layers.#layer].current }
     /** @param {Drawing} drawing */
-    set current(drawing) { this.#layers[this.#layer].current = drawing }
+    set current(drawing) { this.#layers[Layers.#layer].current = drawing }
 }
 
 export { _Animation, Layers }

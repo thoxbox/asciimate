@@ -199,12 +199,12 @@ function render(layers = null) {
 class Timeline extends HTMLElement {
     static move(amountX, amountY) {
         _Animation.frame += amountX;
-        layers.layer += amountY;
+        Layers.layer += amountY;
         this.#renderTimeline();
     }
     static set(x, y) {
         _Animation.frame = x;
-        layers.layer = y;
+        Layers.layer = y;
         this.#renderTimeline();
     }
     static #renderTimeline() {
@@ -212,10 +212,10 @@ class Timeline extends HTMLElement {
         $$(`.timeline-item:nth-child(${_Animation.frame + 1})`).forEach(el => {
             el.classList.add("timeline-selected-same-column");
         });
-        $$(`.layer:nth-child(${layers.layer + 1}) > div`).forEach(el => {
+        $$(`.layer:nth-child(${Layers.layer + 1}) > div`).forEach(el => {
             el.classList.add("timeline-selected-same-row");
         });
-        $(`.layer:nth-child(${layers.layer + 1}) > div:nth-child(${_Animation.frame + 1})`)
+        $(`.layer:nth-child(${Layers.layer + 1}) > div:nth-child(${_Animation.frame + 1})`)
             .className = "timeline-item timeline-selected";
     }
     static #initInnerHTML = "";
@@ -225,7 +225,7 @@ class Timeline extends HTMLElement {
             ${"<div></div>".repeat(_Animation.length)}
         </div>
         <div id="_timeline_layers">`;
-        for (let j = 0; j < layers.layers.length; j++) {
+        for (let j = 0; j < Layers.length; j++) {
             this.#initInnerHTML += "<div class='layer'>";
             for (let i = 0; i < _Animation.length; i++) {
                 this.#initInnerHTML += `<div 
@@ -378,7 +378,7 @@ function start() {
         }
         render(
             getCurrentLayers()
-                .map((x, i) => i === layers.layer ? drawingPreview : x)
+                .map((x, i) => i === Layers.layer ? drawingPreview : x)
         );
     }, 50);
 
