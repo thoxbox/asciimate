@@ -45,10 +45,12 @@ class Layers {
         }
         _timeline.innerHTML = rendered;
     }
+    static length = null;
+
     #layer = 0;
 
     set layer(layer) {
-        this.#layer = mod(layer, this.#layers.length);
+        this.#layer = mod(layer, Layers.length);
     }
     get layer() { return this.#layer }
 
@@ -56,14 +58,17 @@ class Layers {
     get layers() { return this.#layers }
 
     /**  @param {string} fillCharacter @param {(_Animation | Drawing)[]} layers*/
-    constructor(fillCharacter, layerAmount, layers = null) {
+    constructor(fillCharacter, layers = null) {
+        if (_Animation.length === null) {
+            throw new Error("Layers.length must be set before creating a Layers object.");
+        }
         if (layers !== null) {
             this.#layers = layers;
         }
         this.#layers = layers !== null ? layers :
-            this.#layers = new Array(layerAmount).fill()
+            this.#layers = new Array(Layers.length).fill()
                 .map(x => new _Animation(fillCharacter));
-        this.#layer = this.#layers.length - 1;
+        this.#layer = Layers.length - 1;
     }
 
     get current() { return this.#layers[this.#layer].current }

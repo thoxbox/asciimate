@@ -316,9 +316,10 @@ $("#_settings_form").addEventListener("submit", e => {
 
 function start() {
     _Animation.length = Number(_settings_frames.value);
+    Layers.length = Number(_settings_layers.value);
     Drawing.width = Number(_settings_width.value);
     Drawing.height = Number(_settings_height.value);
-    layers = new Layers(" ", Number(_settings_layers.value));
+    layers = new Layers(" ");
     _timeline.innerHTML = '<timeline-></timeline->';
     currentDrawing.render();
     pixelRect = $(".pixel").getBoundingClientRect();
