@@ -3,10 +3,13 @@
 import { clamp, inRange, mod, $, $$ } from "./utils.js";
 import Mouse from "./mouse.js";
 import HoveredElement from "./HoveredElement.js";
+
 import Drawing from "./Drawing.js";
 import Layers from "./Layers.js";
 import _Animation from "./_Animation.js";
+
 import Timeline from "./web-components/timeline.js";
+import Toggle from "./web-components/toggle.js";
 
 class DrawingSelection {
     /** @type {{x: number, y: number}[]} */
@@ -198,24 +201,6 @@ function render(layers = null) {
     }
     rendered.render();
 }
-class Toggle extends HTMLElement {
-    #checked = false;
-    set checked(bool) {
-        this.#checked = bool;
-        this.setAttribute("checked", this.checked);
-    }
-    get checked() { return this.#checked }
-    onchange = () => { }
-    connectedCallback() {
-        this.style.display = 'block';
-        this.checked = !!this.getAttribute("checked");
-        this.onclick = () => {
-            this.checked = !this.checked;
-            this.onchange();
-        }
-    }
-}
-customElements.define("toggle-", Toggle);
 class OptionButton extends HTMLElement {
     checked = false;
     name = "";
