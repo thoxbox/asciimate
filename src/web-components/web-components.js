@@ -3,4 +3,4 @@ import Toggle from "./toggle.js";
 
 import Timeline from "./timeline.js";
 
-export { OptionButton, Toggle, Timeline};
+export { OptionButton, Toggle, Timeline };

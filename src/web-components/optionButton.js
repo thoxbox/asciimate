@@ -1,3 +1,5 @@
+import { $$ } from "../utils.js";
+
 class OptionButton extends HTMLElement {
     checked = false;
     name = "";
