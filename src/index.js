@@ -4,7 +4,8 @@ import { clamp, inRange, mod, $, $$ } from "./utils.js";
 import Mouse from "./mouse.js";
 import HoveredElement from "./HoveredElement.js";
 import Drawing from "./Drawing.js";
-import { _Animation, Layers } from "./timeline.js";
+import Layers from "./Layers.js";
+import _Animation from "./_Animation.js";
 
 class DrawingSelection {
     /** @type {{x: number, y: number}[]} */
