@@ -8,9 +8,7 @@ import Drawing from "./Drawing.js";
 import Layers from "./Layers.js";
 import _Animation from "./_Animation.js";
 
-import Timeline from "./web-components/timeline.js";
-import Toggle from "./web-components/toggle.js";
-import OptionButton from "./web-components/optionButton.js";
+import * as Components from "./web-components/web-components.js";
 
 class DrawingSelection {
     /** @type {{x: number, y: number}[]} */
@@ -235,7 +233,7 @@ function start() {
                 Insert.end();
             }
             _play.setAttribute("data-setintervalid", setInterval(() => {
-                Timeline.move(1, 0);
+                Components.Timeline.move(1, 0);
                 render();
             }, 100));
         } else {
@@ -246,7 +244,7 @@ function start() {
         }
     };
 
-    OptionButton.onswitch = (index, name) => {
+    Components.OptionButton.onswitch = (index, name) => {
         if (name !== "tools") {
             return;
         }
@@ -286,17 +284,17 @@ function start() {
         if (e.key.startsWith("Arrow")) {
             switch (e.key) {
                 case "ArrowUp":
-                    Timeline.move(0, 1);
+                    Components.Timeline.move(0, 1);
                     break;
                 case "ArrowDown":
-                    Timeline.move(0, -1);
+                    Components.Timeline.move(0, -1);
                     break;
                 case "ArrowRight":
-                    Timeline.move(1, 0);
+                    Components.Timeline.move(1, 0);
                     e.preventDefault();
                     break;
                 case "ArrowLeft":
-                    Timeline.move(-1, 0);
+                    Components.Timeline.move(-1, 0);
                     e.preventDefault();
                     break;
             }
