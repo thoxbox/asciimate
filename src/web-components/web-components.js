@@ -1,6 +1,6 @@
-import OptionButton from "./optionButton.js";
-import Toggle from "./toggle.js";
+import OptionButton from "./OptionButton.js";
+import Toggle from "./Toggle.js";
 
-import Timeline from "./timeline.js";
+import Timeline from "./Timeline.js";
 
 export { OptionButton, Toggle, Timeline };

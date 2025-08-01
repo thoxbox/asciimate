@@ -1,7 +1,7 @@
 "use strict";
 
 import { clamp, inRange, mod, $, $$ } from "./utils.js";
-import Mouse from "./mouse.js";
+import Mouse from "./Mouse.js";
 import HoveredElement from "./HoveredElement.js";
 
 import Drawing from "./Drawing.js";

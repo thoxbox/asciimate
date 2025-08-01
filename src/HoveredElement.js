@@ -1,4 +1,4 @@
-import Mouse from "./mouse.js";
+import Mouse from "./Mouse.js";
 class HoveredElement {
     static #hoveredElement;
     static update() {
