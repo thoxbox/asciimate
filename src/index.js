@@ -18,12 +18,15 @@ class Brush {
 
     /** @param {number} brushSize */
     constructor(brushSize) {
-        this.#size = clamp(brushSize, 1, pixelWidth * Drawing.width);
+        if(Brush.pixelWidth === null) {
+            throw new Error("Brush.pixelWidth and Brush.pixelHeight must be set before creating a Brush object.");
+        }
+        this.#size = clamp(brushSize, 1, Brush.pixelWidth * Drawing.width);
         this.#calculateDimensions();
     }
 
     set size(value) {
-        this.#size = clamp(value, 1, pixelWidth * Drawing.width);
+        this.#size = clamp(value, 1, Brush.pixelWidth * Drawing.width);
         this.#calculateDimensions();
     }
     get size() { return this.#size }
@@ -38,8 +41,8 @@ class Brush {
         ];
     }
     #calculateDimensions() {
-        this.#width = Math.round(this.#size / pixelWidth);
-        this.#height = Math.round(this.#size / pixelHeight);
+        this.#width = Math.round(this.#size / Brush.pixelWidth);
+        this.#height = Math.round(this.#size / Brush.pixelHeight);
     }
     /** @type {string} */
     static #character;
@@ -50,6 +53,8 @@ class Brush {
         this.#character = character.charAt(0);
         _character.innerHTML = this.#character;
     }
+    static pixelWidth = null;
+    static pixelHeight = null;
 }
 
 class Insert {
@@ -151,8 +156,6 @@ function render(layers = null) {
 }
 
 let pixelRect;
-let pixelWidth;
-let pixelHeight;
 let brush;
 
 $("#_settings_form").addEventListener("submit", e => {
@@ -169,8 +172,8 @@ function start() {
     _timeline.innerHTML = '<timeline-></timeline->';
     currentDrawing.render();
     pixelRect = $(".pixel").getBoundingClientRect();
-    pixelWidth = pixelRect.width;
-    pixelHeight = pixelRect.height;
+    Brush.pixelWidth = pixelRect.width;
+    Brush.pixelHeight = pixelRect.height;
     Brush.character = "a";
     brush = new Brush(3);
     HoveredElement.update();
