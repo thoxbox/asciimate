@@ -123,16 +123,20 @@ function start() {
     Layers.length = Number(_settings_layers.value);
     Drawing.width = Number(_settings_width.value);
     Drawing.height = Number(_settings_height.value);
+    _settings.close();
+
     layers = new Layers(" ");
-    _timeline.innerHTML = '<timeline-></timeline->';
     currentDrawing.render();
+
+    _timeline.innerHTML = '<timeline-></timeline->';
+
     pixelRect = $(".pixel").getBoundingClientRect();
     Brush.pixelWidth = pixelRect.width;
     Brush.pixelHeight = pixelRect.height;
     Brush.character = "a";
     brush = new Brush(3);
+
     HoveredElement.update();
-    _settings.close();
 
     _play.onchange = e => {
         if (_play.checked) {
