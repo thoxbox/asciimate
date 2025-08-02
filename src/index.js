@@ -10,7 +10,11 @@ import Layers from "./Layers.js";
 import _Animation from "./_Animation.js";
 import Brush from "./Brush.js";
 
-import * as Components from "./web-components/web-components.js";
+import {
+    OptionButton as OptionComponent,
+    Timeline as TimelineComponent,
+    Toggle as ToggleComponent
+} from "./web-components/web-components.js";
 
 class Insert {
     static start() {
@@ -155,7 +159,7 @@ function start() {
         }
     };
 
-    Components.OptionButton.onswitch = (index, name) => {
+    OptionComponent.onswitch = (index, name) => {
         if (name !== "tools") {
             return;
         }
@@ -195,17 +199,17 @@ function start() {
         if (e.key.startsWith("Arrow")) {
             switch (e.key) {
                 case "ArrowUp":
-                    Components.Timeline.move(0, 1);
+                    TimelineComponent.move(0, 1);
                     break;
                 case "ArrowDown":
-                    Components.Timeline.move(0, -1);
+                    TimelineComponent.move(0, -1);
                     break;
                 case "ArrowRight":
-                    Components.Timeline.move(1, 0);
+                    TimelineComponent.move(1, 0);
                     e.preventDefault();
                     break;
                 case "ArrowLeft":
-                    Components.Timeline.move(-1, 0);
+                    TimelineComponent.move(-1, 0);
                     e.preventDefault();
                     break;
             }
