@@ -1,5 +1,5 @@
 import Drawing from "./Drawing.js";
-import _Animation from "./_Animation.js";
+import Frames from "./Frames.js";
 import { mod } from "./utils.js";
 
 class Layers {
@@ -12,12 +12,12 @@ class Layers {
     }
     static get layer() { return this.#layer }
 
-    /** @type {(_Animation | Drawing)[]} */ #layers;
+    /** @type {(Frames | Drawing)[]} */ #layers;
     get layers() { return this.#layers }
 
-    /**  @param {string} fillCharacter @param {(_Animation | Drawing)[]} layers*/
+    /**  @param {string} fillCharacter @param {(Frames | Drawing)[]} layers*/
     constructor(fillCharacter, layers = null) {
-        if (_Animation.length === null) {
+        if (Frames.length === null) {
             throw new Error("Layers.length must be set before creating a Layers object.");
         }
         if (layers !== null) {
@@ -25,7 +25,7 @@ class Layers {
         }
         this.#layers = layers !== null ? layers :
             this.#layers = new Array(Layers.length).fill()
-                .map(x => new _Animation(fillCharacter));
+                .map(x => new Frames(fillCharacter));
         Layers.#layer = Layers.length - 1;
     }
 

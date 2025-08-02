@@ -1,40 +1,40 @@
 import Layers from "../Layers.js";
-import _Animation from "../_Animation.js";
+import Frames from "../Frames.js";
 import { $, $$ } from "../utils.js";
 import HoveredElement from "../HoveredElement.js";
 
 class Timeline extends HTMLElement {
     static move(amountX, amountY) {
-        _Animation.frame += amountX;
+        Frames.frame += amountX;
         Layers.layer += amountY;
         this.#renderTimeline();
     }
     static set(x, y) {
-        _Animation.frame = x;
+        Frames.frame = x;
         Layers.layer = y;
         this.#renderTimeline();
     }
     static #renderTimeline() {
         $$(".timeline-item").forEach(el => el.className = "timeline-item");
-        $$(`.timeline-item:nth-child(${_Animation.frame + 1})`).forEach(el => {
+        $$(`.timeline-item:nth-child(${Frames.frame + 1})`).forEach(el => {
             el.classList.add("timeline-selected-same-column");
         });
         $$(`.layer:nth-child(${Layers.layer + 1}) > div`).forEach(el => {
             el.classList.add("timeline-selected-same-row");
         });
-        $(`.layer:nth-child(${Layers.layer + 1}) > div:nth-child(${_Animation.frame + 1})`)
+        $(`.layer:nth-child(${Layers.layer + 1}) > div:nth-child(${Frames.frame + 1})`)
             .className = "timeline-item timeline-selected";
     }
     static #initInnerHTML = "";
     static #elementLoaded = false;
     static #init = () => {
         this.#initInnerHTML += `<div id="_timeline_numbers">
-            ${"<div></div>".repeat(_Animation.length)}
+            ${"<div></div>".repeat(Frames.length)}
         </div>
         <div id="_timeline_layers">`;
         for (let j = 0; j < Layers.length; j++) {
             this.#initInnerHTML += "<div class='layer'>";
-            for (let i = 0; i < _Animation.length; i++) {
+            for (let i = 0; i < Frames.length; i++) {
                 this.#initInnerHTML += `<div 
                     class="timeline-item"
                     data-x="${i}"

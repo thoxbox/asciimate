@@ -7,7 +7,7 @@ import HoveredElement from "./HoveredElement.js";
 import Drawing from "./Drawing.js";
 import DrawingSelection from "./DrawingSelection.js";
 import Layers from "./Layers.js";
-import _Animation from "./_Animation.js";
+import Frames from "./Frames.js";
 import Brush from "./Brush.js";
 
 import {
@@ -123,7 +123,7 @@ $("#_settings_form").addEventListener("submit", e => {
 }, {once: true});
 
 function start() {
-    _Animation.length = Number(_settings_frames.value);
+    Frames.length = Number(_settings_frames.value);
     Layers.length = Number(_settings_layers.value);
     Drawing.width = Number(_settings_width.value);
     Drawing.height = Number(_settings_height.value);
