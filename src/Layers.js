@@ -3,19 +3,6 @@ import _Animation from "./_Animation.js";
 import { mod } from "./utils.js";
 
 class Layers {
-    initTimeline() {
-        let rendered = "";
-        for (let j = 0; j < this.#layers.length; j++) {
-            rendered += "<div class='layer'>";
-            for (let i = 0; i < _Animation.length; i++) {
-                rendered += `<div 
-                    onclick="layers.layer = ${j}; _Animation.frame = ${i}; renderTimeline()"
-                >${i + 1}</div>`;
-            }
-            rendered += "</div>";
-        }
-        _timeline.innerHTML = rendered;
-    }
     static length = null;
 
     static #layer = 0;
