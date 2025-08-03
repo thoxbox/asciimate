@@ -19,31 +19,34 @@ import {
 class Insert {
     static start() {
         this.active = true;
-        _drawing.setAttribute("data-insert", "");
-        _drawing.addEventListener("click", () => {
+        nodes.drawing.setAttribute("data-insert", "");
+        nodes.drawing.addEventListener("click", () => {
             Insert.advance();
         }, {once: true});
     }
     /** @type {{x: number, y: number}} */
     static #pixel;
     static advance() {
-        _drawing.removeAttribute("data-insert");
+        nodes.drawing.removeAttribute("data-insert");
         this.#pixel = getXYofPixel(HoveredElement.get());
-        const _insertTextRendered = () => {
-            _insertText.focus();
-            _insertText.onkeydown = e => {
+        const insertTextRendered = () => {
+            const insertText = $("#_insertText");
+            insertText.focus();
+            insertText.onkeydown = e => {
                 if (e.altKey && e.key == "Enter") {
-                    _insertText.onblur = null;
-                    _insertText.onkeydown = null;
+                    insertText.onblur = null;
+                    insertText.onkeydown = null;
                     this.render();
                 }
             }
-            _insertText.onblur = () => _insertText.focus();
-            window.getSelection().setBaseAndExtent(_insertText, 0, _insertText, 1);
+            insertText.onblur = () => insertText.focus();
+            window.getSelection().setBaseAndExtent(
+                insertText, 0, insertText, 1
+            );
             observer.disconnect();
         }
         let observer = new MutationObserver(mutations => {
-            _insertTextRendered();
+            insertTextRendered();
             console.log("something happened");
         });
         observer.observe(HoveredElement.get(), { childList: true });
@@ -59,7 +62,7 @@ class Insert {
             + HoveredElement.get().innerHTML;
     }
     static render() {
-        let text = _insertText.textContent;
+        let text = $("#_insertText").textContent;
         for (const [y, line] of text.split("\n").entries()) {
             for (const [x, char] of line.split("").entries()) {
                 currentDrawing.setPixel(this.#pixel.x + x, this.#pixel.y + y, char);
@@ -69,8 +72,7 @@ class Insert {
         this.start();
     }
     static end() {
-        _drawing.removeAttribute("data-insert");
-        _drawing.removeAttribute("onclick");
+        nodes.drawing.removeAttribute("data-insert");
         this.active = false;
     }
     static active = false;
@@ -80,7 +82,22 @@ class Insert {
     }
 }
 
-_settings.showModal();
+const nodes = Object.freeze({
+    settings: $("#_settings"),
+    settingsWidth: $("#_settings_width"),
+    settingsHeight: $("#_settings_height"),
+    settingsLayers: $("#_settings_layers"),
+    settingsFrames: $("#_settings_frames"),
+    settingsForm: $("#_settings_form"),
+    drawing: $("#_drawing"),
+    play: $("#_play"),
+    toolsInsert: $("#_tools_insert"),
+    timeline: $("#_timeline"),
+    character: $("#_character")
+});
+
+nodes.settings.showModal();
+
 /** @type {Layers} */
 let layers;
 Object.defineProperty(window, "currentDrawing", {
@@ -117,22 +134,22 @@ function render(layers = null) {
 let pixelRect;
 let brush;
 
-$("#_settings_form").addEventListener("submit", e => {
+nodes.settingsForm.addEventListener("submit", e => {
     start();
     e.preventDefault();
 }, {once: true});
 
 function start() {
-    Frames.length = Number(_settings_frames.value);
-    Layers.length = Number(_settings_layers.value);
-    Drawing.width = Number(_settings_width.value);
-    Drawing.height = Number(_settings_height.value);
-    _settings.close();
+    Frames.length = Number(nodes.settingsFrames.value);
+    Layers.length = Number(nodes.settingsLayers.value);
+    Drawing.width = Number(nodes.settingsWidth.value);
+    Drawing.height = Number(nodes.settingsHeight.value);
+    nodes.settings.close();
 
     layers = new Layers(" ");
     currentDrawing.render();
 
-    _timeline.innerHTML = '<timeline-></timeline->';
+    nodes.timeline.innerHTML = '<timeline-></timeline->';
 
     pixelRect = $(".pixel").getBoundingClientRect();
     Brush.pixelWidth = pixelRect.width;
@@ -142,20 +159,20 @@ function start() {
 
     HoveredElement.update();
 
-    _play.onchange = e => {
-        if (_play.checked) {
-            if (_tools_insert.checked) {
+    nodes.play.onchange = e => {
+        if (nodes.play.checked) {
+            if (nodes.toolsInsert.checked) {
                 Insert.end();
             }
-            _play.setAttribute("data-setintervalid", setInterval(() => {
+            nodes.play.setAttribute("data-setintervalid", setInterval(() => {
                 Components.Timeline.move(1, 0);
                 render();
             }, 100));
         } else {
-            if (_tools_insert.checked) {
+            if (nodes.toolsInsert.checked) {
                 Insert.start();
             }
-            clearInterval(_play.getAttribute("data-setintervalid"));
+            clearInterval(nodes.play.getAttribute("data-setintervalid"));
         }
     };
 
@@ -164,7 +181,7 @@ function start() {
             return;
         }
         if (index === 1) {
-            if (!_play.checked) { Insert.start() }
+            if (!nodes.play.checked) { Insert.start() }
             return;
         }
         Insert.end();
@@ -176,7 +193,7 @@ function start() {
     }
 
     setInterval(() => {
-        if (_play.checked) { return }
+        if (nodes.play.checked) { return }
         HoveredElement.update();
         if (Insert.active) { return }
         let pixelPos = getXYofPixel(HoveredElement.get());
@@ -214,7 +231,7 @@ function start() {
                     break;
             }
         }
-        if (!drawingHovered() && HoveredElement.get() !== _character) { return }
+        if (!drawingHovered() && HoveredElement.get() !== nodes.character) { return }
         if (e.key.length > 1) { return }
         Brush.character = e.key;
     }
