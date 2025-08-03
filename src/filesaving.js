@@ -11,6 +11,20 @@ function save(layers) {
             });
         });
     }
+    const noChange = Symbol("no change");
+    /** @param {string[]} frame1 @param {string[]} frame2  */
+    function diffFrames(frame1, frame2) {
+        let diff = [];
+        frame2.forEach((char, i) => {
+            if (char === frame1[i]) {
+                diff.push(noChange);
+            }
+            else {
+                diff.push(char);
+            }
+        });
+        return diff;
+    }
     return toJSONFormat(layers);
 }
 
