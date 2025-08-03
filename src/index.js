@@ -52,7 +52,6 @@ class Insert {
         }
         let observer = new MutationObserver(mutations => {
             insertTextRendered();
-            console.log("something happened");
         });
         observer.observe(HoveredElement.get(), { childList: true });
         HoveredElement.get().innerHTML = `<div
