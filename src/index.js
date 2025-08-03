@@ -165,7 +165,7 @@ function start() {
                 Insert.end();
             }
             nodes.play.setAttribute("data-setintervalid", setInterval(() => {
-                Components.Timeline.move(1, 0);
+                TimelineComponent.move(1, 0);
                 render();
             }, 100));
         } else {
