@@ -10,6 +10,8 @@ import Layers from "./Layers.js";
 import Frames from "./Frames.js";
 import Brush from "./Brush.js";
 
+import { save, load } from "./filesaving.js";
+
 import {
     OptionButton as OptionComponent,
     Timeline as TimelineComponent,
