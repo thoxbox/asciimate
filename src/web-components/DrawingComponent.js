@@ -2,7 +2,7 @@ import Drawing from "../Drawing.js";
 import { $$ } from "../utils.js";
 
 class DrawingComponent extends HTMLElement {
-    /** @param {Drawing} drawing */
+
     static #rendered;
     static render(drawing) {
         this.#rendered = drawing.map((x, i) => {
@@ -10,11 +10,27 @@ class DrawingComponent extends HTMLElement {
                 .map(x => `<span class="pixel">${x}</span>`)
                 .join("") + "\n";
         }).join("");
-        this.#rendered = `<pre>${this.#rendered}</pre>`;
-        $$("drawing-").forEach(el => el.innerHTML = rendered);
+        $$("drawing-").forEach(el => {
+            el.querySelector("pre").innerHTML = this.#rendered
+        });
     }
     static forEach(callbackfn) {
         $$("drawing-").forEach(callbackfn);
+    }
+    static #initInnerHTML = "";
+    static #elementLoaded = false;
+    static #init = () => {
+        this.#initInnerHTML = "<pre></pre>";
+    }
+    constructor() {
+        super();
+    }
+    connectedCallback() {
+        if (!DrawingComponent.#elementLoaded) {
+            DrawingComponent.#elementLoaded = true;
+            DrawingComponent.#init();
+        }
+        this.innerHTML = DrawingComponent.#initInnerHTML;
     }
 }
 customElements.define("drawing-", DrawingComponent);
