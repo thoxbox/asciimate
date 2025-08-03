@@ -18,7 +18,7 @@ body {
     max-height: 200px;
     justify-content: center;
 }
-#_drawing {
+drawing- > pre {
     width: fit-content;
     overflow: scroll;
     font-family: monospace;
@@ -113,12 +113,12 @@ body {
     overflow: hidden;
     justify-content: center;
 }
-#_insertText{
+.insertText{
     outline: 2px solid black;
     display: inline;
     background-color: white;
 }
-#_drawing[data-insert] > *:hover {
+drawing-[data-insert] > pre > *:hover {
     outline: 2px solid black;
     animation: blink 1s infinite linear;
 }
