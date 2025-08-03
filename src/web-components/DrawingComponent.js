@@ -3,13 +3,14 @@ import { $$ } from "../utils.js";
 
 class DrawingComponent extends HTMLElement {
     /** @param {Drawing} drawing */
+    static #rendered;
     static render(drawing) {
-        let rendered = drawing.map((x, i) => {
+        this.#rendered = drawing.map((x, i) => {
             return x
                 .map(x => `<span class="pixel">${x}</span>`)
                 .join("") + "\n";
         }).join("");
-        rendered = `<pre>${rendered}</pre>`;
+        this.#rendered = `<pre>${this.#rendered}</pre>`;
         $$("drawing-").forEach(el => el.innerHTML = rendered);
     }
     static forEach(callbackfn) {
