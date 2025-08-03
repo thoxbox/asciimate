@@ -2,16 +2,13 @@ import Drawing from "../Drawing.js";
 import { $$ } from "../utils.js";
 
 class DrawingComponent extends HTMLElement {
-
-    static #rendered;
+    /** @param {string[][]} drawing  */
     static render(drawing) {
-        this.#rendered = drawing.map((x, i) => {
-            return x
-                .map(x => `<span class="pixel">${x}</span>`)
-                .join("") + "\n";
-        }).join("");
+        drawing = drawing.flat();
         $$("drawing-").forEach(el => {
-            el.querySelector("pre").innerHTML = this.#rendered
+            el.querySelectorAll(".pixel").forEach((pixel, i) => {
+                pixel.textContent = drawing[i];
+            });
         });
     }
     static forEach(callbackfn) {
@@ -20,7 +17,11 @@ class DrawingComponent extends HTMLElement {
     static #initInnerHTML = "";
     static #elementLoaded = false;
     static #init = () => {
-        this.#initInnerHTML = "<pre></pre>";
+        this.#initInnerHTML += "<pre>";
+        this.#initInnerHTML += Array(Drawing.height).fill(
+            "<span class=\"pixel\"></span>".repeat(Drawing.width)
+        ).join("\n");
+        this.#initInnerHTML += "</pre>";
     }
     constructor() {
         super();
