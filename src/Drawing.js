@@ -1,4 +1,5 @@
 import { inRange } from "./utils.js";
+import DrawingComponent from "./web-components/DrawingComponent.js";
 
 class Drawing {
     /** @type {number} */ static width = null;
@@ -29,11 +30,7 @@ class Drawing {
         return this.#drawing[y][x];
     }
     render() {
-        _drawing.innerHTML = this.#drawing.map((x, i) => {
-            return x
-                .map(x => `<span class="pixel">${x}</span>`)
-                .join("") + "\n"
-        }).join("");
+        DrawingComponent.render(this.#drawing);
     }
     /** @param {Drawing} drawing */
     static clone(drawing) {

@@ -13,24 +13,29 @@ import Brush from "./Brush.js";
 import {
     OptionButton as OptionComponent,
     Timeline as TimelineComponent,
-    Toggle as ToggleComponent
+    Toggle as ToggleComponent,
+    DrawingComponent
 } from "./web-components/web-components.js";
 
 class Insert {
     static start() {
         this.active = true;
-        nodes.drawing.setAttribute("data-insert", "");
-        nodes.drawing.addEventListener("click", () => {
-            Insert.advance();
-        }, {once: true});
+        DrawingComponent.forEach(el => {
+            el.setAttribute("data-insert", "");
+            el.addEventListener("click", () => {
+                Insert.advance();
+            }, {once: true});
+        });
     }
     /** @type {{x: number, y: number}} */
     static #pixel;
     static advance() {
-        nodes.drawing.removeAttribute("data-insert");
+        DrawingComponent.forEach(el => {
+            el.removeAttribute("data-insert");
+        });
         this.#pixel = getXYofPixel(HoveredElement.get());
         const insertTextRendered = () => {
-            const insertText = $("#_insertText");
+            const insertText = $(".insertText");
             insertText.focus();
             insertText.onkeydown = e => {
                 if (e.altKey && e.key == "Enter") {
@@ -54,15 +59,15 @@ class Insert {
                 style="
                     position: absolute; 
                     display: inline-block;"
-                id="_insert"
+                class="insert"
             ><div
                 contenteditable
-                id="_insertText"
+                class="insertText"
             >${HoveredElement.get().innerHTML}</div></div>`
             + HoveredElement.get().innerHTML;
     }
     static render() {
-        let text = $("#_insertText").textContent;
+        let text = $(".insertText").textContent;
         for (const [y, line] of text.split("\n").entries()) {
             for (const [x, char] of line.split("").entries()) {
                 currentDrawing.setPixel(this.#pixel.x + x, this.#pixel.y + y, char);
@@ -72,7 +77,9 @@ class Insert {
         this.start();
     }
     static end() {
-        nodes.drawing.removeAttribute("data-insert");
+        DrawingComponent.forEach(el => {
+            el.removeAttribute("data-insert");
+        });
         this.active = false;
     }
     static active = false;
@@ -147,9 +154,10 @@ function start() {
     nodes.settings.close();
 
     layers = new Layers(" ");
-    currentDrawing.render();
 
-    nodes.timeline.innerHTML = '<timeline-></timeline->';
+    nodes.timeline.innerHTML = "<timeline-></timeline->";
+    nodes.drawing.innerHTML = "<drawing-></drawing->";
+    currentDrawing.render();
 
     pixelRect = $(".pixel").getBoundingClientRect();
     Brush.pixelWidth = pixelRect.width;
