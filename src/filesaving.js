@@ -25,7 +25,19 @@ function save(layers) {
         });
         return diff;
     }
-    return toJSONFormat(layers);
+    /** @param {(string | symbol)[][]} layer */
+    function diffLayer(layer) {
+        let diffedLayer = [];
+        layer.forEach((frame, i, arr) => {
+            if(i === 0) {
+                diffedLayer.push(frame);
+                return;
+            }
+            diffedLayer.push(diffFrames(arr[i - 1], frame));
+        });
+        return diffedLayer;
+    }
+    return toJSONFormat(layers).map(layer => diffLayer(layer));
 }
 
 /** @returns {Layers} */
