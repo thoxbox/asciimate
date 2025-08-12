@@ -15,14 +15,9 @@ function save(layers) {
     /** @param {string[]} frame1 @param {string[]} frame2  */
     function diffFrames(frame1, frame2) {
         let diff = [];
-        frame2.forEach((char, i) => {
-            if (char === frame1[i]) {
-                diff.push(noChange);
-            }
-            else {
-                diff.push(char);
-            }
-        });
+        frame2.forEach((char, i) => diff.push(
+            char === frame1[i] ? noChange : char
+        ));
         return diff;
     }
     /** @param {(string | symbol)[][]} layer */
