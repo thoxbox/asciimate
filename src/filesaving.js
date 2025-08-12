@@ -5,11 +5,9 @@ import Drawing from "./Drawing.js";
 /** @param {Layers} layers */
 function save(layers) {
     function toJSONFormat(layers) {
-        return layers.layers.map(layer => {
-            return layer.animation.map(frame => {
-                return frame.drawing.flat()
-            });
-        });
+        return layers.layers.map(layer => 
+            layer.animation.map(frame => frame.drawing.flat())
+        );
     }
     const noChange = Symbol("no change");
     /** @param {string[]} frame1 @param {string[]} frame2  */
