@@ -20,7 +20,18 @@ function save(layers) {
         return layer.map((frame, i, arr) =>
             i > 0 ? diffFrames(arr[i - 1], frame) : frame);
     }
-    return toJSONFormat(layers).map(layer => diffLayer(layer));
+    /** @param {(string | symbol)[]} frame */
+    function runLengthEncode(frame) {
+        let encoded = [{value: frame[0], repeat: 0}];
+        frame.forEach(x => x === encoded.at(-1).value ?
+            encoded.at(-1).repeat += 1 :
+            encoded.push({value: x, repeat: 1})
+        );
+        return encoded;
+    }
+    return toJSONFormat(layers)
+        .map(layer => diffLayer(layer))
+        .map(layer => runLengthEncode(layer.flat()));
 }
 
 /** @returns {Layers} */
