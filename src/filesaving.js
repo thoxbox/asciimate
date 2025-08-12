@@ -28,13 +28,9 @@ function save(layers) {
     /** @param {(string | symbol)[][]} layer */
     function diffLayer(layer) {
         let diffedLayer = [];
-        layer.forEach((frame, i, arr) => {
-            if(i === 0) {
-                diffedLayer.push(frame);
-                return;
-            }
-            diffedLayer.push(diffFrames(arr[i - 1], frame));
-        });
+        layer.forEach((frame, i, arr) => diffedLayer.push(
+            i > 0 ? diffFrames(arr[i - 1], frame) : frame
+        ));
         return diffedLayer;
     }
     return toJSONFormat(layers).map(layer => diffLayer(layer));
