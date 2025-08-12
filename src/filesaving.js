@@ -5,6 +5,8 @@ import { pipe } from "./utils.js";
 
 /** @param {Layers} layers */
 function save(layers) {
+    /** @param {Layers} layers */
+    /** @returns {string[][][]} */
     function toJSONFormat(layers) {
         return layers.layers.map(layer => 
             layer.animation.map(frame => frame.drawing.flat())
@@ -30,10 +32,29 @@ function save(layers) {
         );
         return encoded;
     }
+    /**
+     * @param {{
+     *   value: string | symbol,
+     *   repeat: number
+     * }[]} layer 
+     * */
+    function encodeLayer(layer) {
+        const noChangeEncoding = "\u0000";
+        const repeatEncoding = Array(10)
+            .fill()
+            .map((_, i) => String.fromCharCode(i + 22));
+        const encodeRepeat = num =>
+            num.toString().split("").map(y => repeatEncoding[y]).join("");
+        return layer.map(x => 
+            (x.repeat === 1 ? "" : encodeRepeat(x.repeat)) +
+            (x.value === noChange ? noChangeEncoding : x.value)
+        ).join("");
+    }
     return pipe(
         toJSONFormat,
         x => x.map(layer => diffLayer(layer)),
-        x => x.map(layer => runLengthEncode(layer.flat()))
+        x => x.map(layer => runLengthEncode(layer.flat())),
+        x => x.map(layer => encodeLayer(layer)).join("\n"),
     )(layers);
 }
 
