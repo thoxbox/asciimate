@@ -1,6 +1,7 @@
 import Layers from "./Layers.js";
 import Frames from "./Frames.js";
 import Drawing from "./Drawing.js";
+import { pipe } from "./utils.js";
 
 /** @param {Layers} layers */
 function save(layers) {
@@ -29,9 +30,11 @@ function save(layers) {
         );
         return encoded;
     }
-    return toJSONFormat(layers)
-        .map(layer => diffLayer(layer))
-        .map(layer => runLengthEncode(layer.flat()));
+    return pipe(
+        toJSONFormat,
+        x => x.map(layer => diffLayer(layer)),
+        x => x.map(layer => runLengthEncode(layer.flat()))
+    )(layers);
 }
 
 /** @returns {Layers} */
