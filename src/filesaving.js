@@ -3,7 +3,10 @@ import Frames from "./Frames.js";
 import Drawing from "./Drawing.js";
 import { pipe } from "./utils.js";
 
-/** @param {Layers} layers */
+/** 
+ * @param {Layers} layers
+ * @returns {Blob}
+ * */
 function save(layers) {
     /** 
      * @param {Layers} layers
@@ -52,6 +55,9 @@ function save(layers) {
             (x.value === noChange ? noChangeEncoding : x.value)
         ).join("");
     }
+    function saveFile(file) {
+        return new Blob([file], { type: "text/plain" })
+    }
     return pipe(
         toJSONFormat,
         x => x.map(layer => diffLayer(layer)),
@@ -62,7 +68,8 @@ function save(layers) {
             height: Drawing.height,
             layers: Layers.length,
             frames: Frames.length,
-        }) + "\n" + x
+        }) + "\n" + x,
+        saveFile,
     )(layers);
 }
 
