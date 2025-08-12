@@ -10,10 +10,11 @@ function inRange(value, min, max) {
 function mod(n, m) {
     return ((n % m) + m) % m;
 }
-
+/** @param {function[]} fns */
+const pipe = (...fns) => (x) => fns.reduce((v, f) => f(v), x);
 /** @param {string} query @returns {HTMLElement} */
 const $ = query => document.querySelector(query);
 /** @param {string} query @returns {NodeListOf<HTMLElement>} */
 const $$ = query => document.querySelectorAll(query);
 
-export { clamp, inRange, mod, $, $$ }
+export { clamp, inRange, mod, pipe, $, $$ }
