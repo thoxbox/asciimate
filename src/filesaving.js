@@ -5,8 +5,10 @@ import { pipe } from "./utils.js";
 
 /** @param {Layers} layers */
 function save(layers) {
-    /** @param {Layers} layers */
-    /** @returns {string[][][]} */
+    /** 
+     * @param {Layers} layers
+     * @returns {string[][][]}
+     * */
     function toJSONFormat(layers) {
         return layers.layers.map(layer => 
             layer.animation.map(frame => frame.drawing.flat())
@@ -55,6 +57,12 @@ function save(layers) {
         x => x.map(layer => diffLayer(layer)),
         x => x.map(layer => runLengthEncode(layer.flat())),
         x => x.map(layer => encodeLayer(layer)).join("\n"),
+        x => JSON.stringify({
+            width: Drawing.width,
+            height: Drawing.height,
+            layers: Layers.length,
+            frames: Frames.length,
+        }) + "\n" + x
     )(layers);
 }
 
