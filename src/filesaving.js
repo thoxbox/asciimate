@@ -14,19 +14,13 @@ function save(layers) {
     const noChange = Symbol("no change");
     /** @param {string[]} frame1 @param {string[]} frame2  */
     function diffFrames(frame1, frame2) {
-        let diff = [];
-        frame2.forEach((char, i) => diff.push(
-            char === frame1[i] ? noChange : char
-        ));
-        return diff;
+        return frame2.map((char, i) =>
+            char === frame1[i] ? noChange : char);
     }
     /** @param {(string | symbol)[][]} layer */
     function diffLayer(layer) {
-        let diffedLayer = [];
-        layer.forEach((frame, i, arr) => diffedLayer.push(
-            i > 0 ? diffFrames(arr[i - 1], frame) : frame
-        ));
-        return diffedLayer;
+        return layer.map((frame, i, arr) =>
+            i > 0 ? diffFrames(arr[i - 1], frame) : frame);
     }
     return toJSONFormat(layers).map(layer => diffLayer(layer));
 }
