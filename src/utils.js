@@ -12,9 +12,16 @@ function mod(n, m) {
 }
 /** @param {function[]} fns */
 const pipe = (...fns) => (x) => fns.reduce((v, f) => f(v), x);
+/** @param {function[]} fns */
+const asyncPipe = (...fns) => async (x) => {
+  for (const fn of fns) {
+    x = await fn(x);
+  }
+  return x;
+};
 /** @param {string} query @returns {HTMLElement} */
 const $ = query => document.querySelector(query);
 /** @param {string} query @returns {NodeListOf<HTMLElement>} */
 const $$ = query => document.querySelectorAll(query);
 
-export { clamp, inRange, mod, pipe, $, $$ }
+export { clamp, inRange, mod, pipe, asyncPipe, $, $$ }
