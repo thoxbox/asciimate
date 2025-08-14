@@ -82,6 +82,21 @@ function load(blob) {
     function loadFile(blob) {
         return blob.text();
     }
+    const noChange = Symbol("no change");
+    /** @param {string} layer */
+    function tokenizeLayer(layer) {
+        const noChangeEncoding = "\u0000";
+        const repeatEncoding = Array(10)
+            .fill()
+            .map((_, i) => String.fromCharCode(i + 22))
+            .map((x, i) => [x, {type: "repeat", value: i}]);
+        const decodeMatch = new Map([
+            ...repeatEncoding,
+            [noChangeEncoding, {type: "value", value: noChange}],
+        ]);
+        return layer.split("")
+            .map(x => decodeMatch.get(x) ?? {type: "value", value: x});
+    }
     let projectData;
     return asyncPipe(
         loadFile,
@@ -89,7 +104,8 @@ function load(blob) {
         x => {
             projectData = JSON.parse[x[0]]
             return x.slice(1);
-        }
+        },
+        x => x.map(layer => tokenizeLayer(layer)),
     )(blob);
 }
 
