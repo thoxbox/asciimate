@@ -1,7 +1,7 @@
 import Layers from "./Layers.js";
 import Frames from "./Frames.js";
 import Drawing from "./Drawing.js";
-import { pipe } from "./utils.js";
+import { pipe, asyncPipe } from "./utils.js";
 
 /** 
  * @param {Layers} layers
@@ -73,9 +73,15 @@ function save(layers) {
     )(layers);
 }
 
-/** @returns {Layers} */
-function load() {
-    
+/** @returns {Promise<Layers>} */
+function load(blob) {
+    /** @param {Blob} blob  */
+    function loadFile(blob) {
+        return blob.text();
+    }
+    return asyncPipe(
+        loadFile,
+    )(blob);
 }
 
 export { save, load }
