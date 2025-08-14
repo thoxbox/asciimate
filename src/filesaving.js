@@ -73,14 +73,23 @@ function save(layers) {
     )(layers);
 }
 
-/** @returns {Promise<Layers>} */
+/** 
+ * @param {Blob} blob
+ * @returns {Promise<Layers>}
+ * */
 function load(blob) {
     /** @param {Blob} blob  */
     function loadFile(blob) {
         return blob.text();
     }
+    let projectData;
     return asyncPipe(
         loadFile,
+        x => x.split("\n"),
+        x => {
+            projectData = JSON.parse[x[0]]
+            return x.slice(1);
+        }
     )(blob);
 }
 
