@@ -181,6 +181,7 @@ function load(blob) {
             unDiffLayer,
         )(layer)),
         toLayersObject,
+        x => ({layers: x, projectData: projectData}),
     )(blob);
 }
 
