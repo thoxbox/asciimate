@@ -147,6 +147,11 @@ function load(blob) {
             Object.values,
         )(encoded);
     }
+    /** @param {string[]} frame1 @param {string | symbol[]} frame2 */
+    function unDiffFrames(frame1, frame2) {
+        return frame2.map((char, i) =>
+            char === noChange ? frame1[i] : char);
+    }
     let projectData;
     return asyncPipe(
         loadFile,
