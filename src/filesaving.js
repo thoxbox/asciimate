@@ -60,9 +60,11 @@ function save(layers) {
     }
     return pipe(
         toJSONFormat,
-        x => x.map(layer => diffLayer(layer)),
-        x => x.map(layer => runLengthEncode(layer.flat())),
-        x => x.map(layer => encodeLayer(layer)).join("\n"),
+        x => x.map(layer => pipe(
+            diffLayer,
+            x => runLengthEncode(x.flat()),
+            encodeLayer,
+        )(layer)).join("\n"),
         x => JSON.stringify({
             width: Drawing.width,
             height: Drawing.height,
@@ -135,8 +137,10 @@ function load(blob) {
             projectData = JSON.parse[x[0]]
             return x.slice(1);
         },
-        x => x.map(layer => tokenizeLayer(layer)),
-        x => x.map(layer => mergeTokens(layer)),
+        x => x.map(layer => pipe(
+            tokenizeLayer,
+            mergeTokens,
+        )(layer)),
     )(blob);
 }
 
