@@ -97,13 +97,35 @@ function load(blob) {
         const repeatEncoding = Array(10)
             .fill()
             .map((_, i) => String.fromCharCode(i + 22))
-            .map((x, i) => [x, new Token(Token.repeat, i)]);
+            .map((x, i) => [x, new Token(Token.repeat, String(i))]);
         const decodeMatch = new Map([
             ...repeatEncoding,
             [noChangeEncoding, new Token(Token.value, noChange)],
         ]);
         return layer.split("")
             .map(x => decodeMatch.get(x) ?? new Token(Token.value, x));
+    }
+    /** @param {Token[]} tokens */
+    function mergeTokens(tokens) {
+        let mergedToken = tokens[0];
+        let mergedTokens = [];
+        tokens.slice(1).forEach(token => {
+            if(token.type !== mergedToken.type) {
+                mergedTokens.push(mergedToken);
+                mergedToken = token;
+                return;
+            }
+            if(token.type === Token.repeat) {
+                mergedToken.value += String(token.value);
+                return;
+            }
+            if(token.type === Token.value) {
+                mergedToken = [mergedToken].flat();
+                mergedToken.push(new Token(Token.repeat, 1), token);
+            }
+        });
+        mergedTokens.push(mergedToken);
+        return mergedTokens.flat();
     }
     let projectData;
     return asyncPipe(
@@ -114,6 +136,7 @@ function load(blob) {
             return x.slice(1);
         },
         x => x.map(layer => tokenizeLayer(layer)),
+        x => x.map(layer => mergeTokens(layer)),
     )(blob);
 }
 
