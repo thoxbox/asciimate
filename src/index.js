@@ -101,7 +101,9 @@ const nodes = Object.freeze({
     play: $("#_play"),
     toolsInsert: $("#_tools_insert"),
     timeline: $("#_timeline"),
-    character: $("#_character")
+    character: $("#_character"),
+    save: $("#_save"),
+    load: $("#_load"),
 });
 
 nodes.settings.showModal();
