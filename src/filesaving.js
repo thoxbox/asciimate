@@ -152,12 +152,19 @@ function load(blob) {
         return frame2.map((char, i) =>
             char === noChange ? frame1[i] : char);
     }
+    /** @param {(string | symbol)[][]} layer */
+    function unDiffLayer(layer) {
+        return layer.reduce((acc, frame, i, arr) => {
+            if(i === 0) {return acc.concat([frame])}
+            return acc.concat([unDiffFrames(acc.at(-1), frame)]);
+        }, []);
+    }
     let projectData;
     return asyncPipe(
         loadFile,
         x => x.split("\n"),
         x => {
-            projectData = JSON.parse[x[0]]
+            projectData = JSON.parse(x[0]);
             return x.slice(1);
         },
         x => x.map(layer => pipe(
@@ -165,6 +172,7 @@ function load(blob) {
             mergeTokens,
             toRunLengthEncodeFormat,
             runLengthDecode,
+            unDiffLayer,
         )(layer)),
     )(blob);
 }
