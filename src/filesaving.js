@@ -157,6 +157,14 @@ function load(blob) {
             return acc.concat([unDiffFrames(acc.at(-1), frame)]);
         }, []);
     }
+    /** @param {string[][][]} JSONFormat */
+    function toLayersObject(JSONFormat) {
+        return new Layers(null, JSONFormat.map(layer => 
+            new Frames(null, layer.map(x => 
+                new Drawing(null, toMatrix(x, Drawing.width))
+            ))
+        ));
+    }
     let projectData;
     return asyncPipe(
         loadFile,
@@ -172,6 +180,7 @@ function load(blob) {
             runLengthDecode,
             unDiffLayer,
         )(layer)),
+        toLayersObject,
     )(blob);
 }
 
