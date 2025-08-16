@@ -1,7 +1,7 @@
 import Layers from "./Layers.js";
 import Frames from "./Frames.js";
 import Drawing from "./Drawing.js";
-import { pipe, asyncPipe } from "./utils.js";
+import { pipe, asyncPipe, toMatrix } from "./utils.js";
 
 /** 
  * @param {Layers} layers
@@ -134,8 +134,7 @@ function load(blob) {
      * @returns {{repeat: number, value: string | symbol}[]} */
     function toRunLengthEncodeFormat(tokens) {
         return pipe(
-            x => Object.groupBy(x, (_, i) => Math.floor(i / 2)),
-            Object.values,
+            x => toMatrix(x, 2),
             x => x.map(x => ({repeat: x[0].value, value: x[1].value}))
         )(tokens);
     }
@@ -143,8 +142,7 @@ function load(blob) {
     function runLengthDecode(encoded) {
         return pipe(
             x => x.flatMap(y => Array(+y.repeat).fill(y.value)),
-            x => Object.groupBy(x, (_, i) => Math.floor(i / (Drawing.width * Drawing.height))),
-            Object.values,
+            x => toMatrix(x, Drawing.width * Drawing.height),
         )(encoded);
     }
     /** @param {string[]} frame1 @param {string | symbol[]} frame2 */

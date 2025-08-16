@@ -10,6 +10,10 @@ function inRange(value, min, max) {
 function mod(n, m) {
     return ((n % m) + m) % m;
 }
+/** @param {any[]} array @param {number} width */
+const toMatrix = (array, width) => Object.values(
+    Object.groupBy(array, (_, i) => Math.floor(i / width))
+);
 /** @param {function[]} fns */
 const pipe = (...fns) => (x) => fns.reduce((v, f) => f(v), x);
 /** @param {function[]} fns */
@@ -24,4 +28,4 @@ const $ = query => document.querySelector(query);
 /** @param {string} query @returns {NodeListOf<HTMLElement>} */
 const $$ = query => document.querySelectorAll(query);
 
-export { clamp, inRange, mod, pipe, asyncPipe, $, $$ }
+export { clamp, inRange, mod, toMatrix, pipe, asyncPipe, $, $$ }
