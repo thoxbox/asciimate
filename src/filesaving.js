@@ -73,6 +73,14 @@ function save(layers) {
     )(layers);
 }
 
+class Token {
+    static repeat = Symbol("repeat");
+    static value = Symbol("value");
+    constructor(type, value) {
+        this.type = type;
+        this.value = value;
+    }
+}
 /** 
  * @param {Blob} blob
  * @returns {Promise<Layers>}
@@ -83,19 +91,19 @@ function load(blob) {
         return blob.text();
     }
     const noChange = Symbol("no change");
-    /** @param {string} layer */
+    /** @param {string} layer @returns {Token[]} */
     function tokenizeLayer(layer) {
         const noChangeEncoding = "\u0000";
         const repeatEncoding = Array(10)
             .fill()
             .map((_, i) => String.fromCharCode(i + 22))
-            .map((x, i) => [x, {type: "repeat", value: i}]);
+            .map((x, i) => [x, new Token(Token.repeat, i)]);
         const decodeMatch = new Map([
             ...repeatEncoding,
-            [noChangeEncoding, {type: "value", value: noChange}],
+            [noChangeEncoding, new Token(Token.value, noChange)],
         ]);
         return layer.split("")
-            .map(x => decodeMatch.get(x) ?? {type: "value", value: x});
+            .map(x => decodeMatch.get(x) ?? new Token(Token.value, x));
     }
     let projectData;
     return asyncPipe(
