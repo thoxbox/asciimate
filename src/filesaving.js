@@ -139,6 +139,14 @@ function load(blob) {
             x => x.map(x => ({repeat: x[0].value, value: x[1].value}))
         )(tokens);
     }
+    /** @param {{repeat: number, value: string | symbol}[]} encoded */
+    function runLengthDecode(encoded) {
+        return pipe(
+            x => x.flatMap(y => Array(+y.repeat).fill(y.value)),
+            x => Object.groupBy(x, (_, i) => Math.floor(i / (Drawing.width * Drawing.height))),
+            Object.values,
+        )(encoded);
+    }
     let projectData;
     return asyncPipe(
         loadFile,
@@ -151,8 +159,8 @@ function load(blob) {
             tokenizeLayer,
             mergeTokens,
             toRunLengthEncodeFormat,
+            runLengthDecode,
         )(layer)),
-        
     )(blob);
 }
 
