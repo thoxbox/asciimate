@@ -129,6 +129,16 @@ function load(blob) {
         mergedTokens.push(mergedToken);
         return mergedTokens.flat();
     }
+    /** 
+     * @param {Token[]} tokens
+     * @returns {{repeat: number, value: string | symbol}[]} */
+    function toRunLengthEncodeFormat(tokens) {
+        return pipe(
+            x => Object.groupBy(x, (_, i) => Math.floor(i / 2)),
+            Object.values,
+            x => x.map(x => ({repeat: x[0].value, value: x[1].value}))
+        )(tokens);
+    }
     let projectData;
     return asyncPipe(
         loadFile,
@@ -140,7 +150,9 @@ function load(blob) {
         x => x.map(layer => pipe(
             tokenizeLayer,
             mergeTokens,
+            toRunLengthEncodeFormat,
         )(layer)),
+        
     )(blob);
 }
 
