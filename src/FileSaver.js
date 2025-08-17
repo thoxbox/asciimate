@@ -26,10 +26,10 @@ class FileSaver {
     }
     /** @param {Blob} blob @param {Object} options */
     static async save(blob, options) {
-        if(fileName.suggestedName === null) {
+        if(options.suggestedName === undefined) {
             throw new Error("File options must include a suggestedName for browser compatibility.");
         }
-        if(window.showOpenFilePicker === undefined) {
+        if(window.showSaveFilePicker === undefined) {
             const downloader = document.createElement("a");
             const url = URL.createObjectURL(blob);
             document.body.appendChild(downloader);
@@ -45,9 +45,34 @@ class FileSaver {
         await writer.write(blob);
         await writer.close();
     }
-    /** @returns {Blob} */
-    static load() {
-        
+    /** 
+     * @param {Object} options
+     * @returns {Promise<File>} */
+    static async load(options) {
+        if(window.showOpenFilePicker === undefined) {
+            return await this.#legacyLoad(options);
+        }
+        const [fileHandle] = await window.showOpenFilePicker(options);
+        return await fileHandle.getFile();
+    }
+    /** 
+     * @param {Object} options
+     * @returns {Promise<File>} */
+    static async #legacyLoad(options) {
+        const downloader = document.createElement("input");
+        downloader.type = "file";
+        downloader.accept = options.types.flatMap(({accept}) => 
+            Object.keys(accept).concat(Object.values(accept).flat())
+        ).join(", ");
+        downloader.dispatchEvent(new MouseEvent("click"));
+        return new Promise((resolve, reject) => {
+            downloader.addEventListener("change", e => {
+                resolve(e.currentTarget.files[0]);
+            }, {once: true});
+            downloader.addEventListener("cancel", () => {
+                reject("User cancelled file open");
+            }, {once: true});
+        });
     }
 }
 
