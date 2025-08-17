@@ -1,7 +1,8 @@
 "use strict";
 
-import { clamp, inRange, mod, $, $$ } from "./utils.js";
+import { clamp, inRange, mod, asyncPipe, $, $$ } from "./utils.js";
 import Mouse from "./Mouse.js";
+import FileSaver from "./FileSaver.js";
 import HoveredElement from "./HoveredElement.js";
 
 import Drawing from "./Drawing.js";
@@ -197,6 +198,29 @@ function start() {
         }
         Insert.end();
     }
+
+    const asciimateFile = FileSaver.createFileOptions(
+        "project.asciimate",
+        "application/asciimate",
+        ".asciimate",
+        "Asciimate File",
+    );
+    nodes.save.addEventListener("click", () => {
+        FileSaver.save(save(layers), asciimateFile);
+    });
+    nodes.load.addEventListener("click", async () => {
+        asyncPipe(
+            x => FileSaver.load(x),
+            x => load(x),
+            x => {
+                layers = x.layers;
+                Drawing.width = x.projectData.width;
+                Drawing.height = x.projectData.height;
+                Layers.length = x.projectData.layers;
+                Frames.length = x.projectData.frames;
+            },
+        )(asciimateFile);
+    });
 
     function drawingHovered() {
         return HoveredElement.get() === null ? false :
