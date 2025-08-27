@@ -82,6 +82,9 @@ class Token {
         this.type = type;
         this.value = value;
     }
+    clone() {
+        return new Token(this.type, this.value);
+    }
 }
 /** 
  * @param {Blob} blob
@@ -109,9 +112,14 @@ function load(blob) {
     }
     /** @param {Token[]} tokens */
     function mergeTokens(tokens) {
-        let mergedToken = tokens[0];
+        let mergedToken;
         let mergedTokens = [];
-        tokens.slice(1).forEach(token => {
+        tokens.forEach((token, i) => {
+            token = token.clone();
+            if(i === 0) {
+                mergedToken = token;
+                return;
+            }
             if(token.type !== mergedToken.type) {
                 mergedTokens.push(mergedToken);
                 mergedToken = token;
@@ -122,12 +130,14 @@ function load(blob) {
                 return;
             }
             if(token.type === Token.value) {
-                mergedToken = [mergedToken].flat();
-                mergedToken.push(new Token(Token.repeat, 1), token);
+                const repeatToken = new Token(Token.repeat, "1");
+                mergedTokens.push(mergedToken.clone(), repeatToken);
+                mergedToken = token;
+                return;
             }
         });
         mergedTokens.push(mergedToken);
-        return mergedTokens.flat();
+        return mergedTokens;
     }
     /** 
      * @param {Token[]} tokens
@@ -135,12 +145,13 @@ function load(blob) {
     function toRunLengthEncodeFormat(tokens) {
         return pipe(
             x => toMatrix(x, 2),
-            x => x.map(x => ({repeat: x[0].value, value: x[1].value}))
+            x => x.map(x => ({repeat: x[0].value, value: x[1].value})),
         )(tokens);
     }
     /** @param {{repeat: number, value: string | symbol}[]} encoded */
     function runLengthDecode(encoded) {
         return pipe(
+            x => x.map(y => ({repeat: y.repeat, value: y.value})),
             x => x.flatMap(y => Array(+y.repeat).fill(y.value)),
             x => toMatrix(x, Drawing.width * Drawing.height),
         )(encoded);
