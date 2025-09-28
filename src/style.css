@@ -4,18 +4,6 @@
 body {
     margin: 20px;
 }
-#_file {
-    border: 1px solid black;
-    display: flex;
-    flex-direction: row;
-    padding: 4px;
-    gap: 4px;
-}
-#_save, #_load {
-    border-radius: 0px;
-    border: 1px solid black;
-    background-color: white;
-}
 #c1 {
     display: flex;
     flex-direction: row;

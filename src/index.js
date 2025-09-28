@@ -1,8 +1,7 @@
 "use strict";
 
-import { clamp, inRange, mod, asyncPipe, $, $$ } from "./utils.js";
+import { clamp, inRange, mod, $, $$ } from "./utils.js";
 import Mouse from "./Mouse.js";
-import FileSaver from "./FileSaver.js";
 import HoveredElement from "./HoveredElement.js";
 
 import Drawing from "./Drawing.js";
@@ -11,14 +10,11 @@ import Layers from "./Layers.js";
 import Frames from "./Frames.js";
 import Brush from "./Brush.js";
 
-import { save, load } from "./filesaving.js";
-
 import {
     OptionButton as OptionComponent,
     Timeline as TimelineComponent,
     Toggle as ToggleComponent,
-    DrawingComponent,
-    Timeline
+    DrawingComponent
 } from "./web-components/web-components.js";
 
 class Insert {
@@ -103,9 +99,7 @@ const nodes = Object.freeze({
     play: $("#_play"),
     toolsInsert: $("#_tools_insert"),
     timeline: $("#_timeline"),
-    character: $("#_character"),
-    save: $("#_save"),
-    load: $("#_load"),
+    character: $("#_character")
 });
 
 nodes.settings.showModal();
@@ -199,30 +193,6 @@ function start() {
         }
         Insert.end();
     }
-
-    const asciimateFile = FileSaver.createFileOptions(
-        "project.asciimate",
-        "application/asciimate",
-        ".asciimate",
-        "Asciimate File",
-    );
-    nodes.save.addEventListener("click", () => {
-        FileSaver.save(save(layers), asciimateFile);
-    });
-    nodes.load.addEventListener("click", async () => {
-        asyncPipe(
-            x => FileSaver.load(x),
-            x => load(x),
-            x => {
-                layers = x.layers;
-                Drawing.width = x.projectData.width;
-                Drawing.height = x.projectData.height;
-                Layers.length = x.projectData.layers;
-                Frames.length = x.projectData.frames;
-                Timeline.updateDimensions();
-            },
-        )(asciimateFile);
-    });
 
     function drawingHovered() {
         return HoveredElement.get() === null ? false :
