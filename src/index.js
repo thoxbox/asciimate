@@ -17,7 +17,8 @@ import {
     OptionButton as OptionComponent,
     Timeline as TimelineComponent,
     Toggle as ToggleComponent,
-    DrawingComponent
+    DrawingComponent,
+    Timeline
 } from "./web-components/web-components.js";
 
 class Insert {
@@ -218,6 +219,7 @@ function start() {
                 Drawing.height = x.projectData.height;
                 Layers.length = x.projectData.layers;
                 Frames.length = x.projectData.frames;
+                Timeline.updateDimensions();
             },
         )(asciimateFile);
     });

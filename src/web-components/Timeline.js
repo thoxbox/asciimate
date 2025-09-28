@@ -28,6 +28,7 @@ class Timeline extends HTMLElement {
     static #initInnerHTML = "";
     static #elementLoaded = false;
     static #init = () => {
+        this.#initInnerHTML = "";
         this.#initInnerHTML += `<div id="_timeline_numbers">
             ${"<div></div>".repeat(Frames.length)}
         </div>
@@ -44,6 +45,15 @@ class Timeline extends HTMLElement {
             this.#initInnerHTML += "</div>";
         }
         this.#initInnerHTML += "</div>"
+    }
+    static updateDimensions() {
+        this.#init();
+        $$("timeline-").forEach(x => x.updateDimensions());
+        this.#renderTimeline();
+    }
+    updateDimensions() {
+        console.log(Timeline.#initInnerHTML)
+        this.innerHTML = Timeline.#initInnerHTML;
     }
     connectedCallback() {
         if (!Timeline.#elementLoaded) {
