@@ -2,6 +2,8 @@
 
 import { clamp, inRange, mod, $, $$ } from "./utils.js";
 import Mouse from "./Mouse.js";
+import FileSaver from "./FileSaver.js";
+import publisher from "./publisher.js";
 import HoveredElement from "./HoveredElement.js";
 
 import Drawing from "./Drawing.js";
@@ -99,7 +101,10 @@ const nodes = Object.freeze({
     play: $("#_play"),
     toolsInsert: $("#_tools_insert"),
     timeline: $("#_timeline"),
-    character: $("#_character")
+    character: $("#_character"),
+    save: $("#_save"),
+    load: $("#_load"),
+    publisher_name: $("#_publisher_name")
 });
 
 nodes.settings.showModal();
@@ -144,6 +149,8 @@ nodes.settingsForm.addEventListener("submit", e => {
     start();
     e.preventDefault();
 }, {once: true});
+nodes.publisher_name.innerHTML = publisher.name;
+document.title = publisher.name;
 
 function start() {
     Frames.length = Number(nodes.settingsFrames.value);
@@ -193,7 +200,30 @@ function start() {
         }
         Insert.end();
     }
-
+    const projectFile = FileSaver.createFileOptions(
+        `project${publisher.fileExtension}`,
+        publisher.mimeType,
+        publisher.fileExtension,
+        `${publisher.name} File`,
+    );
+    nodes.save.addEventListener("click", () => {
+        FileSaver.save(save(layers), projectFile);
+    });
+    nodes.load.addEventListener("click", async () => {
+        asyncPipe(
+            x => FileSaver.load(x),
+            x => load(x),
+            x => {
+                layers = x.layers;
+                Drawing.width = x.projectData.width;
+                Drawing.height = x.projectData.height;
+                Layers.length = x.projectData.layers;
+                Frames.length = x.projectData.frames;
+                Timeline.updateDimensions();
+                DrawingComponent.updateDimensions();
+            },
+        )(projectFile);
+    });
     function drawingHovered() {
         return HoveredElement.get() === null ? false :
             HoveredElement.get().getAttribute("class") === "pixel";
