@@ -1,6 +1,6 @@
 "use strict";
 
-import { clamp, inRange, mod, asyncPipe, $, $$ } from "./utils.js";
+import { clamp, inRange, mod, $, $$ } from "./utils.js";
 import Mouse from "./Mouse.js";
 import FileSaver from "./FileSaver.js";
 import publisher from "./publisher.js";
@@ -12,14 +12,11 @@ import Layers from "./Layers.js";
 import Frames from "./Frames.js";
 import Brush from "./Brush.js";
 
-import { save, load } from "./filesaving.js";
-
 import {
     OptionButton as OptionComponent,
     Timeline as TimelineComponent,
     Toggle as ToggleComponent,
-    DrawingComponent,
-    Timeline
+    DrawingComponent
 } from "./web-components/web-components.js";
 
 class Insert {
@@ -203,7 +200,6 @@ function start() {
         }
         Insert.end();
     }
-
     const projectFile = FileSaver.createFileOptions(
         `project${publisher.fileExtension}`,
         publisher.mimeType,
@@ -228,7 +224,6 @@ function start() {
             },
         )(projectFile);
     });
-
     function drawingHovered() {
         return HoveredElement.get() === null ? false :
             HoveredElement.get().getAttribute("class") === "pixel";

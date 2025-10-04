@@ -28,7 +28,6 @@ class Timeline extends HTMLElement {
     static #initInnerHTML = "";
     static #elementLoaded = false;
     static #init = () => {
-        this.#initInnerHTML = "";
         this.#initInnerHTML += `<div id="_timeline_numbers">
             ${"<div></div>".repeat(Frames.length)}
         </div>
