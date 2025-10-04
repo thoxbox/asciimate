@@ -2,6 +2,7 @@ import Layers from "./Layers.js";
 import Frames from "./Frames.js";
 import Drawing from "./Drawing.js";
 import { pipe, asyncPipe, toMatrix } from "./utils.js";
+import publisher from "./publisher.js"
 
 /** 
  * @param {Layers} layers
@@ -70,6 +71,7 @@ function save(layers) {
             height: Drawing.height,
             layers: Layers.length,
             frames: Frames.length,
+            version: publisher.version,
         }) + "\n" + x,
         saveFile,
     )(layers);
