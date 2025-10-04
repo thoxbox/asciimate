@@ -3,6 +3,7 @@
 import { clamp, inRange, mod, asyncPipe, $, $$ } from "./utils.js";
 import Mouse from "./Mouse.js";
 import FileSaver from "./FileSaver.js";
+import publisher from "./publisher.js";
 import HoveredElement from "./HoveredElement.js";
 
 import Drawing from "./Drawing.js";
@@ -106,6 +107,7 @@ const nodes = Object.freeze({
     character: $("#_character"),
     save: $("#_save"),
     load: $("#_load"),
+    publisher_name: $("#_publisher_name")
 });
 
 nodes.settings.showModal();
@@ -150,6 +152,8 @@ nodes.settingsForm.addEventListener("submit", e => {
     start();
     e.preventDefault();
 }, {once: true});
+nodes.publisher_name.innerHTML = publisher.name;
+document.title = publisher.name;
 
 function start() {
     Frames.length = Number(nodes.settingsFrames.value);
@@ -200,14 +204,14 @@ function start() {
         Insert.end();
     }
 
-    const asciimateFile = FileSaver.createFileOptions(
-        "project.asciimate",
-        "application/asciimate",
-        ".asciimate",
-        "Asciimate File",
+    const projectFile = FileSaver.createFileOptions(
+        `project${publisher.fileExtension}`,
+        publisher.mimeType,
+        publisher.fileExtension,
+        `${publisher.name} File`,
     );
     nodes.save.addEventListener("click", () => {
-        FileSaver.save(save(layers), asciimateFile);
+        FileSaver.save(save(layers), projectFile);
     });
     nodes.load.addEventListener("click", async () => {
         asyncPipe(
@@ -222,7 +226,7 @@ function start() {
                 Timeline.updateDimensions();
                 DrawingComponent.updateDimensions();
             },
-        )(asciimateFile);
+        )(projectFile);
     });
 
     function drawingHovered() {
