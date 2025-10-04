@@ -1,7 +1,7 @@
 import { $ } from "./utils.js";
 
 class FileSaver {
-    /** 
+    /**
      * @param {string} fileName
      * @param {string} mimeType
      * @param {string | string[]} fileExtension
@@ -12,32 +12,29 @@ class FileSaver {
         fileExtension = null,
         description = null,
     ) {
+        const accept = {
+            [mimeType ?? "application/unknown"]: [fileExtension ?? []].flat(),
+        };
+        const types = [
+            {
+                description: description ?? "",
+                accept: accept,
+            },
+        ];
         return {
             suggestedName: fileName,
-            types: [
-                {
-                    description : description ?? "",
-                    accept: {
-                        [mimeType ?? "application/unknown"]: [fileExtension ?? []].flat()
-                    },
-                },
-            ],
-        }
+            types: types,
+        };
     }
     /** @param {Blob} blob @param {Object} options */
     static async save(blob, options) {
         if(options.suggestedName === undefined) {
-            throw new Error("File options must include a suggestedName for browser compatibility.");
+            throw new Error(
+                "File options must include a suggestedName for browser compatibility."
+            );
         }
         if(window.showSaveFilePicker === undefined) {
-            const downloader = document.createElement("a");
-            const url = URL.createObjectURL(blob);
-            document.body.appendChild(downloader);
-            downloader.href = url;
-            downloader.download = options.suggestedName;
-            downloader.click();
-            downloader.remove();
-            URL.revokeObjectURL(url);
+            this.#legacySave(blob, options);
             return;
         }
         const fileHandle = await window.showSaveFilePicker(options);
@@ -45,7 +42,18 @@ class FileSaver {
         await writer.write(blob);
         await writer.close();
     }
-    /** 
+    /** @param {Blob} blob @param {Object} options */
+    static async #legacySave(blob, options) {
+        const downloader = document.createElement("a");
+        const url = URL.createObjectURL(blob);
+        document.body.appendChild(downloader);
+        downloader.href = url;
+        downloader.download = options.suggestedName;
+        downloader.click();
+        downloader.remove();
+        URL.revokeObjectURL(url);
+    }
+    /**
      * @param {Object} options
      * @returns {Promise<File>} */
     static async load(options) {
@@ -55,15 +63,17 @@ class FileSaver {
         const [fileHandle] = await window.showOpenFilePicker(options);
         return await fileHandle.getFile();
     }
-    /** 
+    /**
      * @param {Object} options
      * @returns {Promise<File>} */
     static async #legacyLoad(options) {
         const downloader = document.createElement("input");
         downloader.type = "file";
-        downloader.accept = options.types.flatMap(({accept}) => 
-            Object.keys(accept).concat(Object.values(accept).flat())
-        ).join(", ");
+        downloader.accept = options.types
+            .flatMap(({ accept }) =>
+                Object.keys(accept).concat(Object.values(accept).flat())
+            )
+            .join(", ");
         downloader.dispatchEvent(new MouseEvent("click"));
         return new Promise((resolve, reject) => {
             downloader.addEventListener("change", e => {
