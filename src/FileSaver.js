@@ -40,7 +40,7 @@ class FileSaver {
             URL.revokeObjectURL(url);
             return;
         }
-        const [fileHandle] = await window.showSaveFilePicker(options);
+        const fileHandle = await window.showSaveFilePicker(options);
         const writer = await fileHandle.createWritable();
         await writer.write(blob);
         await writer.close();
