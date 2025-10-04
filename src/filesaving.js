@@ -153,7 +153,7 @@ function load(blob) {
         return pipe(
             x => x.map(y => ({repeat: y.repeat, value: y.value})),
             x => x.flatMap(y => Array(+y.repeat).fill(y.value)),
-            x => toMatrix(x, Drawing.width * Drawing.height),
+            x => toMatrix(x, projectData.width * projectData.height),
         )(encoded);
     }
     /** @param {string[]} frame1 @param {string | symbol[]} frame2 */
@@ -172,7 +172,7 @@ function load(blob) {
     function toLayersObject(JSONFormat) {
         return new Layers(null, JSONFormat.map(layer => 
             new Frames(null, layer.map(x => 
-                new Drawing(null, toMatrix(x, Drawing.width))
+                new Drawing(null, toMatrix(x, projectData.width))
             ))
         ));
     }

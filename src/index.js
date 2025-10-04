@@ -220,6 +220,7 @@ function start() {
                 Layers.length = x.projectData.layers;
                 Frames.length = x.projectData.frames;
                 Timeline.updateDimensions();
+                DrawingComponent.updateDimensions();
             },
         )(asciimateFile);
     });

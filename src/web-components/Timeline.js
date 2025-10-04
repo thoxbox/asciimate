@@ -52,7 +52,6 @@ class Timeline extends HTMLElement {
         this.#renderTimeline();
     }
     updateDimensions() {
-        console.log(Timeline.#initInnerHTML)
         this.innerHTML = Timeline.#initInnerHTML;
     }
     connectedCallback() {
