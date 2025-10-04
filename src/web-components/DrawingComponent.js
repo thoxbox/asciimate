@@ -19,11 +19,19 @@ class DrawingComponent extends HTMLElement {
     static #initInnerHTML = "";
     static #elementLoaded = false;
     static #init = () => {
+        this.#initInnerHTML = "";
         this.#initInnerHTML += "<pre>";
         this.#initInnerHTML += Array(Drawing.height).fill(
             "<span class=\"pixel\"></span>".repeat(Drawing.width)
         ).join("\n");
         this.#initInnerHTML += "</pre>";
+    }
+    static updateDimensions() {
+        this.#init();
+        $$("drawing-").forEach(x => x.updateDimensions());
+    }
+    updateDimensions() {
+        this.innerHTML = DrawingComponent.#initInnerHTML;
     }
     constructor() {
         super();

@@ -45,6 +45,14 @@ class Timeline extends HTMLElement {
         }
         this.#initInnerHTML += "</div>"
     }
+    static updateDimensions() {
+        this.#init();
+        $$("timeline-").forEach(x => x.updateDimensions());
+        this.#renderTimeline();
+    }
+    updateDimensions() {
+        this.innerHTML = Timeline.#initInnerHTML;
+    }
     connectedCallback() {
         if (!Timeline.#elementLoaded) {
             Timeline.#elementLoaded = true;
