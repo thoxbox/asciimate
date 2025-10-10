@@ -1,8 +1,9 @@
 "use strict";
 
-import { clamp, inRange, mod, $, $$ } from "./utils.js";
+import { clamp, inRange, mod, $, $$, asyncPipe } from "./utils.js";
 import Mouse from "./Mouse.js";
 import FileSaver from "./FileSaver.js";
+import { save, load } from "./filesaving.js";
 import publisher from "./publisher.js";
 import HoveredElement from "./HoveredElement.js";
 
@@ -219,7 +220,7 @@ function start() {
                 Drawing.height = x.projectData.height;
                 Layers.length = x.projectData.layers;
                 Frames.length = x.projectData.frames;
-                Timeline.updateDimensions();
+                TimelineComponent.updateDimensions();
                 DrawingComponent.updateDimensions();
             },
         )(projectFile);
