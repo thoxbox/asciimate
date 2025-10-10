@@ -3,7 +3,7 @@ import Frames from "../Frames.js";
 import { $, $$ } from "../utils.js";
 import HoveredElement from "../HoveredElement.js";
 
-class Timeline extends HTMLElement {
+class TimelineComponent extends HTMLElement {
     static move(amountX, amountY) {
         Frames.frame += amountX;
         Layers.layer += amountY;
@@ -52,25 +52,25 @@ class Timeline extends HTMLElement {
         this.#renderTimeline();
     }
     updateDimensions() {
-        this.innerHTML = Timeline.#initInnerHTML;
+        this.innerHTML = TimelineComponent.#initInnerHTML;
     }
     connectedCallback() {
-        if (!Timeline.#elementLoaded) {
-            Timeline.#elementLoaded = true;
-            Timeline.#init();
+        if (!TimelineComponent.#elementLoaded) {
+            TimelineComponent.#elementLoaded = true;
+            TimelineComponent.#init();
         }
-        this.innerHTML = Timeline.#initInnerHTML;
+        this.innerHTML = TimelineComponent.#initInnerHTML;
         this.addEventListener("click", e => {
             if(!HoveredElement.get().classList.contains("timeline-item")) {
                 return;
             }
             const x = HoveredElement.get().getAttribute("data-x")
             const y = HoveredElement.get().getAttribute("data-y")
-            Timeline.set(x, y);
+            TimelineComponent.set(x, y);
         })
-        Timeline.#renderTimeline();
+        TimelineComponent.#renderTimeline();
     }
 }
-customElements.define("timeline-", Timeline);
+customElements.define("timeline-", TimelineComponent);
 
-export default Timeline;
+export default TimelineComponent;

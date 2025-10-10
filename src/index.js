@@ -15,7 +15,7 @@ import Brush from "./Brush.js";
 
 import {
     OptionButton as OptionComponent,
-    Timeline as TimelineComponent,
+    TimelineComponent,
     Toggle as ToggleComponent,
     DrawingComponent
 } from "./web-components/web-components.js";
