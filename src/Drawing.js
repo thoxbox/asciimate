@@ -4,27 +4,39 @@ import DrawingComponent from "./web-components/DrawingComponent.js";
 class Drawing {
     /** @type {number} */ static width = null;
     /** @type {number} */ static height = null;
+    /** @param {number} x @param {number} y */
+    static pixelInRange(x, y) {
+        return (
+            inRange(x, 0, Drawing.width - 1) &&
+            inRange(y, 0, Drawing.height - 1)
+        );
+    }
     /**  @type {string[][]} */
     #drawing;
     /** @param {string} fillCharacter @param {string[][]} drawing */
     constructor(fillCharacter, drawing = null) {
         if (Drawing.width === null || Drawing.height === null) {
-            throw new Error("Drawing.width and Drawing.height must be set before creating a Drawing object.");
+            throw new Error(
+                "Drawing.width and Drawing.height must be set before creating a Drawing object."
+            );
         }
-        this.#drawing = drawing ? drawing :
-            Array(Drawing.height).fill().map(x => Array(Drawing.width).fill(fillCharacter));
+        this.#drawing =
+            drawing ??
+            Array(Drawing.height)
+                .fill()
+                .map(x => Array(Drawing.width).fill(fillCharacter));
     }
     get drawing() { return structuredClone(this.#drawing) }
     /** @param {number} x @param {number} y @param {string} character */
     setPixel(x, y, character) {
-        if (!(inRange(x, 0, Drawing.width - 1) && inRange(y, 0, Drawing.height - 1))) {
+        if (!Drawing.pixelInRange(x, y)) {
             return;
         }
         this.#drawing[y][x] = character;
     }
     /** @param {number} x @param {number} y */
     getPixel(x, y) {
-        if (!(inRange(x, 0, Drawing.width - 1) && inRange(y, 0, Drawing.height - 1))) {
+        if (!Drawing.pixelInRange(x, y)) {
             return;
         }
         return this.#drawing[y][x];
