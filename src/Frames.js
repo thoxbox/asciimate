@@ -20,9 +20,11 @@ class Frames {
         if (Frames.length === null) {
             throw new Error("Frames.length must be set before creating an Frames object.");
         }
-        this.#animation = animation !== null ? animation :
-            this.#animation = new Array(Frames.length).fill()
-                .map(x => new Drawing(fillCharacter));
+        this.#animation =
+            animation ??
+            new Array(Frames.length)
+                .fill()
+                .map((x) => new Drawing(fillCharacter));
     }
 
     get current() { return this.#animation[Frames.frame] }

@@ -20,12 +20,11 @@ class Layers {
         if (Frames.length === null) {
             throw new Error("Layers.length must be set before creating a Layers object.");
         }
-        if (layers !== null) {
-            this.#layers = layers;
-        }
-        this.#layers = layers !== null ? layers :
-            this.#layers = new Array(Layers.length).fill()
-                .map(x => new Frames(fillCharacter));
+        this.#layers =
+            layers ??
+            new Array(Layers.length)
+                .fill()
+                .map((x) => new Frames(fillCharacter));
         Layers.#layer = Layers.length - 1;
     }
 
