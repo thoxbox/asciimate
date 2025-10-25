@@ -20,10 +20,15 @@ character.
 Click on the brush icon in the toolbar to enable it.
 ### Animation & Layering
 Use the arrow keys to navigate the animation timeline. Transparency in layers counts as the space character. The 'Play' checkbox plays back your animation when checked.
+### Uploading/Downloading
+The Save and Load buttons allow you to upload/download projects.
+
+Click "Save" to save the project as a `.asciimate` file. The default name for a Asciimate project is `project.asciimate`.
+
+Click "Load" to put a file with the `.asciimate` file extension into the editor.
 
 ## Planned Features:
 - Character viewer
 - Project settings after the creation of a project.
 - Variable width font support
 - Palettes
-- Uploading/Downloading
