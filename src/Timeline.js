@@ -18,7 +18,7 @@ class Timeline {
     /**  @param {string} fillCharacter @param {(Frames | Drawing)[]} layers*/
     constructor(fillCharacter, layers = null) {
         if (Frames.length === null) {
-            throw new Error("Layers.length must be set before creating a Layers object.");
+            throw new Error("Timeline.layersLength must be set before creating a Timeline object.");
         }
         this.#timeline =
             layers ??
