@@ -15,13 +15,13 @@ class Timeline {
     /** @type {(Frames | Drawing)[]} */ #timeline;
     get timeline() { return this.#timeline }
 
-    /**  @param {string} fillCharacter @param {(Frames | Drawing)[]} layers*/
-    constructor(fillCharacter, layers = null) {
+    /**  @param {string} fillCharacter @param {(Frames | Drawing)[]} timeline */
+    constructor(fillCharacter, timeline = null) {
         if (Frames.length === null) {
             throw new Error("Timeline.layersLength must be set before creating a Timeline object.");
         }
         this.#timeline =
-            layers ??
+            timeline ??
             new Array(Timeline.layersLength)
                 .fill()
                 .map((x) => new Frames(fillCharacter));
