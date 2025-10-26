@@ -111,10 +111,10 @@ const nodes = Object.freeze({
 nodes.settings.showModal();
 
 /** @type {Timeline} */
-let layers;
+let timeline;
 Object.defineProperty(window, "currentDrawing", {
-    get() { return layers.current },
-    set(value) { layers.current = value },
+    get() { return timeline.current },
+    set(value) { timeline.current = value },
 });
 /** @param {Element} pixelNode */
 function getXYofPixel(pixelNode) {
@@ -160,7 +160,7 @@ function start() {
     Drawing.height = Number(nodes.settingsHeight.value);
     nodes.settings.close();
 
-    layers = new Timeline(" ");
+    timeline = new Timeline(" ");
 
     nodes.timeline.innerHTML = "<timeline-></timeline->";
     nodes.drawing.innerHTML = "<drawing-></drawing->";
@@ -208,14 +208,14 @@ function start() {
         `${publisher.name} File`,
     );
     nodes.save.addEventListener("click", () => {
-        FileSaver.save(save(layers), projectFile);
+        FileSaver.save(save(timeline), projectFile);
     });
     nodes.load.addEventListener("click", async () => {
         asyncPipe(
             x => FileSaver.load(x),
             x => load(x),
             x => {
-                layers = x.layers;
+                timeline = x.layers;
                 Drawing.width = x.projectData.width;
                 Drawing.height = x.projectData.height;
                 Timeline.layersLength = x.projectData.layers;
