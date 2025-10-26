@@ -33,7 +33,7 @@ class TimelineComponent extends HTMLElement {
             ${"<div></div>".repeat(Frames.length)}
         </div>
         <div id="_timeline_layers">`;
-        for (let j = 0; j < Timeline.length; j++) {
+        for (let j = 0; j < Timeline.layersLength; j++) {
             this.#initInnerHTML += "<div class='layer'>";
             for (let i = 0; i < Frames.length; i++) {
                 this.#initInnerHTML += `<div 

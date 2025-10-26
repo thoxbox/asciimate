@@ -155,7 +155,7 @@ document.title = publisher.name;
 
 function start() {
     Frames.length = Number(nodes.settingsFrames.value);
-    Timeline.length = Number(nodes.settingsLayers.value);
+    Timeline.layersLength = Number(nodes.settingsLayers.value);
     Drawing.width = Number(nodes.settingsWidth.value);
     Drawing.height = Number(nodes.settingsHeight.value);
     nodes.settings.close();
@@ -218,7 +218,7 @@ function start() {
                 layers = x.layers;
                 Drawing.width = x.projectData.width;
                 Drawing.height = x.projectData.height;
-                Timeline.length = x.projectData.layers;
+                Timeline.layersLength = x.projectData.layers;
                 Frames.length = x.projectData.frames;
                 TimelineComponent.updateDimensions();
                 DrawingComponent.updateDimensions();

@@ -3,12 +3,12 @@ import Frames from "./Frames.js";
 import { mod } from "./utils.js";
 
 class Timeline {
-    static length = null;
+    static layersLength = null;
 
     static #layer = 0;
 
     static set layer(layer) {
-        this.#layer = mod(layer, Timeline.length);
+        this.#layer = mod(layer, Timeline.layersLength);
     }
     static get layer() { return this.#layer }
 
@@ -22,10 +22,10 @@ class Timeline {
         }
         this.#layers =
             layers ??
-            new Array(Timeline.length)
+            new Array(Timeline.layersLength)
                 .fill()
                 .map((x) => new Frames(fillCharacter));
-        Timeline.#layer = Timeline.length - 1;
+        Timeline.#layer = Timeline.layersLength - 1;
     }
 
     get current() { return this.#layers[Timeline.#layer].current }

@@ -69,7 +69,7 @@ function save(layers) {
         x => JSON.stringify({
             width: Drawing.width,
             height: Drawing.height,
-            layers: Timeline.length,
+            layers: Timeline.layersLength,
             frames: Frames.length,
             version: publisher.version,
         }) + "\n" + x,
