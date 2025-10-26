@@ -128,13 +128,13 @@ function getXYofPixel(pixelNode) {
 function getCurrentLayers() {
     return layers.timeline.map(x => x.current);
 }
-/** @param {Drawing[]} layers */
-function render(layers = null) {
-    if (layers === null) {
-        layers = getCurrentLayers();
+/** @param {Drawing[]} timeline */
+function render(timeline = null) {
+    if (timeline === null) {
+        timeline = getCurrentLayers();
     }
     let rendered = new Drawing(" ");
-    for (let i of layers) {
+    for (let i of timeline) {
         let selection = new DrawingSelection(i);
         selection.filterPixels(x => x !== " ");
         selection.drawing = rendered;
