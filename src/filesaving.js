@@ -1,16 +1,16 @@
-import Layers from "./Layers.js";
+import Timeline from "./Timeline.js";
 import Frames from "./Frames.js";
 import Drawing from "./Drawing.js";
 import { pipe, asyncPipe, toMatrix } from "./utils.js";
 import publisher from "./publisher.js"
 
 /** 
- * @param {Layers} layers
+ * @param {Timeline} layers
  * @returns {Blob}
  * */
 function save(layers) {
     /** 
-     * @param {Layers} layers
+     * @param {Timeline} layers
      * @returns {string[][][]}
      * */
     function toJSONFormat(layers) {
@@ -69,7 +69,7 @@ function save(layers) {
         x => JSON.stringify({
             width: Drawing.width,
             height: Drawing.height,
-            layers: Layers.length,
+            layers: Timeline.length,
             frames: Frames.length,
             version: publisher.version,
         }) + "\n" + x,
@@ -90,7 +90,7 @@ class Token {
 }
 /** 
  * @param {Blob} blob
- * @returns {Promise<Layers>}
+ * @returns {Promise<Timeline>}
  * */
 function load(blob) {
     /** @param {Blob} blob  */
@@ -172,7 +172,7 @@ function load(blob) {
     }
     /** @param {string[][][]} JSONFormat */
     function toLayersObject(JSONFormat) {
-        return new Layers(null, JSONFormat.map(layer => 
+        return new Timeline(null, JSONFormat.map(layer => 
             new Frames(null, layer.map(x => 
                 new Drawing(null, toMatrix(x, projectData.width))
             ))

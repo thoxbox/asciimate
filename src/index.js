@@ -9,7 +9,7 @@ import HoveredElement from "./HoveredElement.js";
 
 import Drawing from "./Drawing.js";
 import DrawingSelection from "./DrawingSelection.js";
-import Layers from "./Layers.js";
+import Timeline from "./Timeline.js";
 import Frames from "./Frames.js";
 import Brush from "./Brush.js";
 
@@ -110,7 +110,7 @@ const nodes = Object.freeze({
 
 nodes.settings.showModal();
 
-/** @type {Layers} */
+/** @type {Timeline} */
 let layers;
 Object.defineProperty(window, "currentDrawing", {
     get() { return layers.current },
@@ -155,12 +155,12 @@ document.title = publisher.name;
 
 function start() {
     Frames.length = Number(nodes.settingsFrames.value);
-    Layers.length = Number(nodes.settingsLayers.value);
+    Timeline.length = Number(nodes.settingsLayers.value);
     Drawing.width = Number(nodes.settingsWidth.value);
     Drawing.height = Number(nodes.settingsHeight.value);
     nodes.settings.close();
 
-    layers = new Layers(" ");
+    layers = new Timeline(" ");
 
     nodes.timeline.innerHTML = "<timeline-></timeline->";
     nodes.drawing.innerHTML = "<drawing-></drawing->";
@@ -218,7 +218,7 @@ function start() {
                 layers = x.layers;
                 Drawing.width = x.projectData.width;
                 Drawing.height = x.projectData.height;
-                Layers.length = x.projectData.layers;
+                Timeline.length = x.projectData.layers;
                 Frames.length = x.projectData.frames;
                 TimelineComponent.updateDimensions();
                 DrawingComponent.updateDimensions();
@@ -245,7 +245,7 @@ function start() {
         }
         render(
             getCurrentLayers()
-                .map((x, i) => i === Layers.layer ? drawingPreview : x)
+                .map((x, i) => i === Timeline.layer ? drawingPreview : x)
         );
     }, 50);
 

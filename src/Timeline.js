@@ -2,13 +2,13 @@ import Drawing from "./Drawing.js";
 import Frames from "./Frames.js";
 import { mod } from "./utils.js";
 
-class Layers {
+class Timeline {
     static length = null;
 
     static #layer = 0;
 
     static set layer(layer) {
-        this.#layer = mod(layer, Layers.length);
+        this.#layer = mod(layer, Timeline.length);
     }
     static get layer() { return this.#layer }
 
@@ -22,15 +22,15 @@ class Layers {
         }
         this.#layers =
             layers ??
-            new Array(Layers.length)
+            new Array(Timeline.length)
                 .fill()
                 .map((x) => new Frames(fillCharacter));
-        Layers.#layer = Layers.length - 1;
+        Timeline.#layer = Timeline.length - 1;
     }
 
-    get current() { return this.#layers[Layers.#layer].current }
+    get current() { return this.#layers[Timeline.#layer].current }
     /** @param {Drawing} drawing */
-    set current(drawing) { this.#layers[Layers.#layer].current = drawing }
+    set current(drawing) { this.#layers[Timeline.#layer].current = drawing }
 }
 
-export default Layers;
+export default Timeline;
