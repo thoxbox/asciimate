@@ -5,10 +5,10 @@ import { pipe, asyncPipe, toMatrix } from "./utils.js";
 import publisher from "./publisher.js"
 
 /** 
- * @param {Timeline} layers
+ * @param {Timeline} timeline
  * @returns {Blob}
  * */
-function save(layers) {
+function save(timeline) {
     /** 
      * @param {Timeline} layers
      * @returns {string[][][]}
@@ -74,7 +74,7 @@ function save(layers) {
             version: publisher.version,
         }) + "\n" + x,
         saveFile,
-    )(layers);
+    )(timeline);
 }
 
 class Token {
