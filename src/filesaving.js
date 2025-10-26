@@ -1,5 +1,4 @@
 import Timeline from "./Timeline.js";
-import Frames from "./Frames.js";
 import Drawing from "./Drawing.js";
 import { pipe, asyncPipe, toMatrix } from "./utils.js";
 import publisher from "./publisher.js"
@@ -15,7 +14,7 @@ function save(timeline) {
      * */
     function toJSONFormat(timeline) {
         return timeline.timeline.map(layer => 
-            layer.animation.map(frame => frame.drawing.flat())
+            layer.map(frame => frame.drawing.flat())
         );
     }
     const noChange = Symbol("no change");
@@ -70,7 +69,7 @@ function save(timeline) {
             width: Drawing.width,
             height: Drawing.height,
             layers: Timeline.layersLength,
-            frames: Frames.length,
+            frames: Timeline.framesLength,
             version: publisher.version,
         }) + "\n" + x,
         saveFile,
@@ -173,9 +172,9 @@ function load(blob) {
     /** @param {string[][][]} JSONFormat */
     function toTimelineObject(JSONFormat) {
         return new Timeline(null, JSONFormat.map(layer => 
-            new Frames(null, layer.map(x => 
+            layer.map(x => 
                 new Drawing(null, toMatrix(x, projectData.width))
-            ))
+            )
         ));
     }
     let projectData;

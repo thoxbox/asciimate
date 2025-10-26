@@ -10,7 +10,6 @@ import HoveredElement from "./HoveredElement.js";
 import Drawing from "./Drawing.js";
 import DrawingSelection from "./DrawingSelection.js";
 import Timeline from "./Timeline.js";
-import Frames from "./Frames.js";
 import Brush from "./Brush.js";
 
 import {
@@ -126,7 +125,7 @@ function getXYofPixel(pixelNode) {
     };
 }
 function getCurrentLayers() {
-    return layers.timeline.map(x => x.current);
+    return timeline.timeline.map(x => x[Timeline.frame]);
 }
 /** @param {Drawing[]} timeline */
 function render(timeline = null) {
@@ -154,7 +153,7 @@ nodes.publisher_name.innerHTML = publisher.name;
 document.title = publisher.name;
 
 function start() {
-    Frames.length = Number(nodes.settingsFrames.value);
+    Timeline.framesLength = Number(nodes.settingsFrames.value);
     Timeline.layersLength = Number(nodes.settingsLayers.value);
     Drawing.width = Number(nodes.settingsWidth.value);
     Drawing.height = Number(nodes.settingsHeight.value);
@@ -219,7 +218,7 @@ function start() {
                 Drawing.width = x.projectData.width;
                 Drawing.height = x.projectData.height;
                 Timeline.layersLength = x.projectData.layers;
-                Frames.length = x.projectData.frames;
+                Timeline.framesLength = x.projectData.frames;
                 TimelineComponent.updateDimensions();
                 DrawingComponent.updateDimensions();
             },
