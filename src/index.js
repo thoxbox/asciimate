@@ -126,7 +126,7 @@ function getXYofPixel(pixelNode) {
     };
 }
 function getCurrentLayers() {
-    return layers.layers.map(x => x.current);
+    return layers.timeline.map(x => x.current);
 }
 /** @param {Drawing[]} layers */
 function render(layers = null) {

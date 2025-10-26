@@ -12,15 +12,15 @@ class Timeline {
     }
     static get layer() { return this.#layer }
 
-    /** @type {(Frames | Drawing)[]} */ #layers;
-    get layers() { return this.#layers }
+    /** @type {(Frames | Drawing)[]} */ #timeline;
+    get timeline() { return this.#timeline }
 
     /**  @param {string} fillCharacter @param {(Frames | Drawing)[]} layers*/
     constructor(fillCharacter, layers = null) {
         if (Frames.length === null) {
             throw new Error("Layers.length must be set before creating a Layers object.");
         }
-        this.#layers =
+        this.#timeline =
             layers ??
             new Array(Timeline.layersLength)
                 .fill()
@@ -28,9 +28,9 @@ class Timeline {
         Timeline.#layer = Timeline.layersLength - 1;
     }
 
-    get current() { return this.#layers[Timeline.#layer].current }
+    get current() { return this.#timeline[Timeline.#layer].current }
     /** @param {Drawing} drawing */
-    set current(drawing) { this.#layers[Timeline.#layer].current = drawing }
+    set current(drawing) { this.#timeline[Timeline.#layer].current = drawing }
 }
 
 export default Timeline;

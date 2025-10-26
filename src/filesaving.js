@@ -14,7 +14,7 @@ function save(layers) {
      * @returns {string[][][]}
      * */
     function toJSONFormat(layers) {
-        return layers.layers.map(layer => 
+        return layers.timeline.map(layer => 
             layer.animation.map(frame => frame.drawing.flat())
         );
     }
