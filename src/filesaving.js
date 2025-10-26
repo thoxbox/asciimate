@@ -171,7 +171,7 @@ function load(blob) {
         }, []);
     }
     /** @param {string[][][]} JSONFormat */
-    function toLayersObject(JSONFormat) {
+    function toTimelineObject(JSONFormat) {
         return new Timeline(null, JSONFormat.map(layer => 
             new Frames(null, layer.map(x => 
                 new Drawing(null, toMatrix(x, projectData.width))
@@ -193,7 +193,7 @@ function load(blob) {
             runLengthDecode,
             unDiffLayer,
         )(layer)),
-        toLayersObject,
+        toTimelineObject,
         x => ({layers: x, projectData: projectData}),
     )(blob);
 }
