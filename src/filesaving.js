@@ -10,11 +10,11 @@ import publisher from "./publisher.js"
  * */
 function save(timeline) {
     /** 
-     * @param {Timeline} layers
+     * @param {Timeline} timeline
      * @returns {string[][][]}
      * */
-    function toJSONFormat(layers) {
-        return layers.timeline.map(layer => 
+    function toJSONFormat(timeline) {
+        return timeline.timeline.map(layer => 
             layer.animation.map(frame => frame.drawing.flat())
         );
     }
