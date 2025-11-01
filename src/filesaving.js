@@ -193,7 +193,7 @@ function load(blob) {
             unDiffLayer,
         )(layer)),
         toTimelineObject,
-        x => ({layers: x, projectData: projectData}),
+        x => ({timeline: x, projectData: projectData}),
     )(blob);
 }
 

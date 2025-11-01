@@ -214,7 +214,7 @@ function start() {
             x => FileSaver.load(x),
             x => load(x),
             x => {
-                timeline = x.layers;
+                timeline = x.timeline;
                 Drawing.width = x.projectData.width;
                 Drawing.height = x.projectData.height;
                 Timeline.layersLength = x.projectData.layers;
