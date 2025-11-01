@@ -127,14 +127,14 @@ function getXYofPixel(pixelNode) {
 /** @param {Drawing[]} drawings */
 function render(drawings = null) {
     if (drawings === null) {
-        drawings = timeline.drawingsInFrame(Timeline.layer);
+        drawings = timeline.drawingsInFrame(Timeline.frame);
     }
     let rendered = new Drawing(" ");
     for (let drawing of drawings) {
         let selection = new DrawingSelection(drawing);
         selection.filterPixels(x => x !== " ");
         selection.drawing = rendered;
-        selection.setPixels((_, x, y) => i.getPixel(x, y));
+        selection.setPixels((_, x, y) => drawing.getPixel(x, y));
     }
     rendered.render();
 }

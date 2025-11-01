@@ -55,7 +55,7 @@ class TimelineComponent extends HTMLElement {
             }
             const x = HoveredElement.get().getAttribute("data-x")
             const y = HoveredElement.get().getAttribute("data-y")
-            TimelineComponent.set(x, y);
+            Timeline.set(x, y);
         })
         TimelineComponent.render();
     }
