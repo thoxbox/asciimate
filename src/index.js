@@ -179,7 +179,7 @@ function start() {
                 Insert.end();
             }
             nodes.play.setAttribute("data-setintervalid", setInterval(() => {
-                TimelineComponent.move(1, 0);
+                Timeline.move(1, 0);
                 render();
             }, 100));
         } else {
@@ -253,17 +253,17 @@ function start() {
         if (e.key.startsWith("Arrow")) {
             switch (e.key) {
                 case "ArrowUp":
-                    TimelineComponent.move(0, 1);
+                    Timeline.move(0, 1);
                     break;
                 case "ArrowDown":
-                    TimelineComponent.move(0, -1);
+                    Timeline.move(0, -1);
                     break;
                 case "ArrowRight":
-                    TimelineComponent.move(1, 0);
+                    Timeline.move(1, 0);
                     e.preventDefault();
                     break;
                 case "ArrowLeft":
-                    TimelineComponent.move(-1, 0);
+                    Timeline.move(-1, 0);
                     e.preventDefault();
                     break;
             }

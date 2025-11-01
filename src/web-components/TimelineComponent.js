@@ -3,17 +3,7 @@ import { $, $$ } from "../utils.js";
 import HoveredElement from "../HoveredElement.js";
 
 class TimelineComponent extends HTMLElement {
-    static move(amountX, amountY) {
-        Timeline.frame += amountX;
-        Timeline.layer += amountY;
-        this.#renderTimeline();
-    }
-    static set(x, y) {
-        Timeline.frame = x;
-        Timeline.layer = y;
-        this.#renderTimeline();
-    }
-    static #renderTimeline() {
+    static render() {
         $$(".timeline-item").forEach(el => el.className = "timeline-item");
         $$(`.timeline-item:nth-child(${Timeline.frame + 1})`).forEach(el => {
             el.classList.add("timeline-selected-same-column");
@@ -48,7 +38,7 @@ class TimelineComponent extends HTMLElement {
     static updateDimensions() {
         this.#init();
         $$("timeline-").forEach(x => x.updateDimensions());
-        this.#renderTimeline();
+        this.render();
     }
     updateDimensions() {
         this.innerHTML = TimelineComponent.#initInnerHTML;
@@ -67,7 +57,7 @@ class TimelineComponent extends HTMLElement {
             const y = HoveredElement.get().getAttribute("data-y")
             TimelineComponent.set(x, y);
         })
-        TimelineComponent.#renderTimeline();
+        TimelineComponent.render();
     }
 }
 customElements.define("timeline-", TimelineComponent);

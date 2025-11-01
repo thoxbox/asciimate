@@ -1,5 +1,7 @@
 import Drawing from "./Drawing.js";
+import DrawingComponent from "./web-components/DrawingComponent.js";
 import { mod } from "./utils.js";
+import TimelineComponent from "./web-components/TimelineComponent.js";
 
 class Timeline {
     /** @type {number | null} */ static layersLength = null;
@@ -24,6 +26,16 @@ class Timeline {
         this.#frame = mod(frame, this.framesLength);
     }
     static get frame() { return this.#frame }
+    static move(frames, layers) {
+        Timeline.frame += frames;
+        Timeline.layer += layers;
+        TimelineComponent.render();
+    }
+    static set(frame, layer) {
+        Timeline.frame = frame;
+        Timeline.layer = layer;
+        TimelineComponent.render();
+    }
 
     /** @type {(Drawing)[][]} */ #timeline;
     get timeline() { return this.#timeline }
