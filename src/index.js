@@ -124,13 +124,10 @@ function getXYofPixel(pixelNode) {
         y: Math.floor(index / Drawing.width)
     };
 }
-function getCurrentLayers() {
-    return timeline.timeline.map(x => x[Timeline.frame]);
-}
 /** @param {Drawing[]} drawings */
 function render(drawings = null) {
     if (drawings === null) {
-        drawings = getCurrentLayers();
+        drawings = timeline.drawingsInFrame(Timeline.layer);
     }
     let rendered = new Drawing(" ");
     for (let drawing of drawings) {
@@ -243,7 +240,7 @@ function start() {
             currentDrawing = Drawing.clone(drawingPreview);
         }
         render(
-            getCurrentLayers()
+            timeline.drawingsInFrame(Timeline.frame)
                 .map((x, i) => i === Timeline.layer ? drawingPreview : x)
         );
     }, 50);

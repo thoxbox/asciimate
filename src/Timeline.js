@@ -63,6 +63,14 @@ class Timeline {
     get current() { return this.#timeline[Timeline.#layer][Timeline.#frame] }
     /** @param {Drawing} drawing */
     set current(drawing) { this.#timeline[Timeline.#layer][Timeline.#frame] = drawing }
+    /** @param {number} frame */
+    drawingsInFrame(frame) {
+        return this.#timeline.map(x => x[frame]);
+    }
+    /** @param {number} layer */
+    drawingsInLayer(layer) {
+        return this.#timeline[layer];
+    }
 }
 
 export default Timeline;
