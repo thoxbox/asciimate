@@ -9,8 +9,7 @@ import HoveredElement from "./HoveredElement.js";
 
 import Drawing from "./Drawing.js";
 import DrawingSelection from "./DrawingSelection.js";
-import Layers from "./Layers.js";
-import Frames from "./Frames.js";
+import Timeline from "./Timeline.js";
 import Brush from "./Brush.js";
 
 import {
@@ -110,11 +109,11 @@ const nodes = Object.freeze({
 
 nodes.settings.showModal();
 
-/** @type {Layers} */
-let layers;
+/** @type {Timeline} */
+let timeline;
 Object.defineProperty(window, "currentDrawing", {
-    get() { return layers.current },
-    set(value) { layers.current = value },
+    get() { return timeline.current },
+    set(value) { timeline.current = value },
 });
 /** @param {Element} pixelNode */
 function getXYofPixel(pixelNode) {
@@ -125,20 +124,17 @@ function getXYofPixel(pixelNode) {
         y: Math.floor(index / Drawing.width)
     };
 }
-function getCurrentLayers() {
-    return layers.layers.map(x => x.current);
-}
-/** @param {Drawing[]} layers */
-function render(layers = null) {
-    if (layers === null) {
-        layers = getCurrentLayers();
+/** @param {Drawing[]} drawings */
+function render(drawings = null) {
+    if (drawings === null) {
+        drawings = timeline.drawingsInFrame(Timeline.frame);
     }
     let rendered = new Drawing(" ");
-    for (let i of layers) {
-        let selection = new DrawingSelection(i);
+    for (let drawing of drawings) {
+        let selection = new DrawingSelection(drawing);
         selection.filterPixels(x => x !== " ");
         selection.drawing = rendered;
-        selection.setPixels((_, x, y) => i.getPixel(x, y));
+        selection.setPixels((_, x, y) => drawing.getPixel(x, y));
     }
     rendered.render();
 }
@@ -154,13 +150,13 @@ nodes.publisher_name.innerHTML = publisher.name;
 document.title = publisher.name;
 
 function start() {
-    Frames.length = Number(nodes.settingsFrames.value);
-    Layers.length = Number(nodes.settingsLayers.value);
+    Timeline.framesLength = Number(nodes.settingsFrames.value);
+    Timeline.layersLength = Number(nodes.settingsLayers.value);
     Drawing.width = Number(nodes.settingsWidth.value);
     Drawing.height = Number(nodes.settingsHeight.value);
     nodes.settings.close();
 
-    layers = new Layers(" ");
+    timeline = new Timeline(" ");
 
     nodes.timeline.innerHTML = "<timeline-></timeline->";
     nodes.drawing.innerHTML = "<drawing-></drawing->";
@@ -180,7 +176,7 @@ function start() {
                 Insert.end();
             }
             nodes.play.setAttribute("data-setintervalid", setInterval(() => {
-                TimelineComponent.move(1, 0);
+                Timeline.move(1, 0);
                 render();
             }, 100));
         } else {
@@ -208,18 +204,18 @@ function start() {
         `${publisher.name} File`,
     );
     nodes.save.addEventListener("click", () => {
-        FileSaver.save(save(layers), projectFile);
+        FileSaver.save(save(timeline), projectFile);
     });
     nodes.load.addEventListener("click", async () => {
         asyncPipe(
             x => FileSaver.load(x),
             x => load(x),
             x => {
-                layers = x.layers;
+                timeline = x.timeline;
                 Drawing.width = x.projectData.width;
                 Drawing.height = x.projectData.height;
-                Layers.length = x.projectData.layers;
-                Frames.length = x.projectData.frames;
+                Timeline.layersLength = x.projectData.layers;
+                Timeline.framesLength = x.projectData.frames;
                 TimelineComponent.updateDimensions();
                 DrawingComponent.updateDimensions();
             },
@@ -244,8 +240,8 @@ function start() {
             currentDrawing = Drawing.clone(drawingPreview);
         }
         render(
-            getCurrentLayers()
-                .map((x, i) => i === Layers.layer ? drawingPreview : x)
+            timeline.drawingsInFrame(Timeline.frame)
+                .map((x, i) => i === Timeline.layer ? drawingPreview : x)
         );
     }, 50);
 
@@ -254,17 +250,17 @@ function start() {
         if (e.key.startsWith("Arrow")) {
             switch (e.key) {
                 case "ArrowUp":
-                    TimelineComponent.move(0, 1);
+                    Timeline.move(0, 1);
                     break;
                 case "ArrowDown":
-                    TimelineComponent.move(0, -1);
+                    Timeline.move(0, -1);
                     break;
                 case "ArrowRight":
-                    TimelineComponent.move(1, 0);
+                    Timeline.move(1, 0);
                     e.preventDefault();
                     break;
                 case "ArrowLeft":
-                    TimelineComponent.move(-1, 0);
+                    Timeline.move(-1, 0);
                     e.preventDefault();
                     break;
             }

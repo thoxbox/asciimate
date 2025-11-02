@@ -1,21 +1,20 @@
-import Layers from "./Layers.js";
-import Frames from "./Frames.js";
+import Timeline from "./Timeline.js";
 import Drawing from "./Drawing.js";
 import { pipe, asyncPipe, toMatrix } from "./utils.js";
 import publisher from "./publisher.js"
 
 /** 
- * @param {Layers} layers
+ * @param {Timeline} timeline
  * @returns {Blob}
  * */
-function save(layers) {
+function save(timeline) {
     /** 
-     * @param {Layers} layers
+     * @param {Timeline} timeline
      * @returns {string[][][]}
      * */
-    function toJSONFormat(layers) {
-        return layers.layers.map(layer => 
-            layer.animation.map(frame => frame.drawing.flat())
+    function toJSONFormat(timeline) {
+        return timeline.timeline.map(layer => 
+            layer.map(frame => frame.drawing.flat())
         );
     }
     const noChange = Symbol("no change");
@@ -69,12 +68,12 @@ function save(layers) {
         x => JSON.stringify({
             width: Drawing.width,
             height: Drawing.height,
-            layers: Layers.length,
-            frames: Frames.length,
+            layers: Timeline.layersLength,
+            frames: Timeline.framesLength,
             version: publisher.version,
         }) + "\n" + x,
         saveFile,
-    )(layers);
+    )(timeline);
 }
 
 class Token {
@@ -90,7 +89,7 @@ class Token {
 }
 /** 
  * @param {Blob} blob
- * @returns {Promise<Layers>}
+ * @returns {Promise<Timeline>}
  * */
 function load(blob) {
     /** @param {Blob} blob  */
@@ -171,11 +170,11 @@ function load(blob) {
         }, []);
     }
     /** @param {string[][][]} JSONFormat */
-    function toLayersObject(JSONFormat) {
-        return new Layers(null, JSONFormat.map(layer => 
-            new Frames(null, layer.map(x => 
+    function toTimelineObject(JSONFormat) {
+        return new Timeline(null, JSONFormat.map(layer => 
+            layer.map(x => 
                 new Drawing(null, toMatrix(x, projectData.width))
-            ))
+            )
         ));
     }
     let projectData;
@@ -193,8 +192,8 @@ function load(blob) {
             runLengthDecode,
             unDiffLayer,
         )(layer)),
-        toLayersObject,
-        x => ({layers: x, projectData: projectData}),
+        toTimelineObject,
+        x => ({timeline: x, projectData: projectData}),
     )(blob);
 }
 
