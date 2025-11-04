@@ -16,6 +16,14 @@ class Action {
         action.#undo();
         this.#undos.push(action);
     }
+    static redo() {
+        if (this.#undos.length === 0) {
+            return;
+        }
+        const action = this.#undos.pop();
+        action.#redo();
+        this.#actions.push(action);
+    }
     /** @type {Function} */
     #undo = () => {};
     /** @type {Function} */
