@@ -3,6 +3,11 @@ class Action {
     static #actions = [];
     /** @type {Action[]} */
     static #undos = [];
+    /** @param {Action} action */
+    static add(action) {
+        this.#actions.push(action);
+        this.#undos = [];
+    }
     /** @type {Function} */
     #undo = () => {};
     /** @type {Function} */
