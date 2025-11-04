@@ -8,6 +8,14 @@ class Action {
         this.#actions.push(action);
         this.#undos = [];
     }
+    static undo() {
+        if (this.#actions.length === 0) {
+            return;
+        }
+        const action = this.#actions.pop();
+        action.#undo();
+        this.#undos.push(action);
+    }
     /** @type {Function} */
     #undo = () => {};
     /** @type {Function} */
