@@ -1,4 +1,8 @@
 class Action {
+    /** @type {Action[]} */
+    static #actions = [];
+    /** @type {Action[]} */
+    static #undos = [];
     /** @type {Function} */
     #undo = () => {};
     /** @type {Function} */
